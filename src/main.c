@@ -5,11 +5,12 @@
 #include "log.h"
 #include "types.h"
 
+#include <glad/gl.h>
 #include <SDL2/SDL.h>
 
 #define SDL_INIT_FLAGS (SDL_INIT_VIDEO)
 
-static void sdl_setup(void)
+static void startup(void)
 {
 	if ((SDL_WasInit(SDL_INIT_FLAGS) & SDL_INIT_FLAGS)) {
 		return;
@@ -17,27 +18,30 @@ static void sdl_setup(void)
 	if (SDL_Init(SDL_INIT_FLAGS) != 0) {
 		DIE("Failed to initialize SDL. %s", SDL_GetError());
 	}
+	grafx_start();
+}
+
+static void shutdown(void)
+{
+	grafx_shutdown();
+	SDL_Quit();
 }
 
 int main(int argc, char **argv)
 {
 	int x, y;
 
+	startup();
 	UNUSED(argc);
 	UNUSED(argv);
-	sdl_setup();
-	grafx_setup();
+	startup();
 	grafx_get_window_size(&x, &y);
-	LOG("%d %d", x, y);
-	grafx_set_draw_color(0, 0, 0, 255);
-	grafx_clear_frame();
 	while (1) {
 		SDL_Delay(88);
-		grafx_set_draw_color(0, 0, 0, 255);
-		grafx_clear_frame();
-		grafx_present_frame();
+		grafx_clear_framebuffer(0.3f, 0.2f, 0.3f, 1.0f);
+		grafx_present_framebuffer();
 		input_poll_events();
 	}
-	SDL_Quit();
+	shutdown();
 	return 0;
 }
