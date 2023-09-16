@@ -5,10 +5,10 @@ CF = -Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes \
      -Wshadow -Wdouble-promotion -Wconversion -Wformat \
      -Wformat-signedness -Wformat-extra-args \
      -Wpointer-arith -Wcast-qual
-LF = -lSDL2main -lSDL2 
+LF = -lSDL2main -lSDL2 -lSDL2_image -ldl -lGL
 DF = -DDEBUG_MODE
-INC = -Iinclude
-SRC = $(wildcard src/*.c)
+INC = -Iinclude -Ilib/glad/include/
+SRC = $(wildcard src/*.c) $(wildcard lib/glad/src/*.c)
 
 all: $(SC)
-	$(CC) -fsanitize=address -g $(CF) $(INC) $(SRC) $(DF) $(LF)
+	$(CC) -g $(CF) $(INC) $(SRC) $(DF) $(LF) 
