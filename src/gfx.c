@@ -16,7 +16,7 @@ static struct {
 	struct SDL_Window *window;
 	struct SDL_GLContext *gl_ctx;
 	int32_t is_safe_mode;
-} grafx_ctx = {NULL, NULL, 1};
+} gfx_ctx = {NULL, NULL, 1};
 
 static struct {
 	SDL_DisplayMode *modes;
@@ -48,30 +48,30 @@ static void get_display_modes(void)
 	}
 }
 
-void grafx_start(void)
+void gfx_start(void)
 {
 	int ww, wh;
 	unsigned int wf;
 
 	// FIXME: SDL_WasInit(0) doesn't seem right. Read doc how handle this.
-	if (!(SDL_WasInit(0)) || grafx_ctx.window || grafx_ctx.gl_ctx) {
+	if (!(SDL_WasInit(0)) || gfx_ctx.window || gfx_ctx.gl_ctx) {
 		return;
 	}
 	ww = SAFE_MODE_WIN_WIDTH;
 	wh = SAFE_MODE_WIN_HEIGHT;
 	wf = SDL_WINDOW_OPENGL;
 	get_display_modes(); // TODO: Find a better name for this func.
-	if (!grafx_ctx.is_safe_mode) {
+	if (!gfx_ctx.is_safe_mode) {
 		ww = display.modes[display.num_modes - 1].w;
 		wh = display.modes[display.num_modes - 1].h;
 		wf |= SDL_WINDOW_FULLSCREEN;
 	}
-	grafx_ctx.window = SDL_CreateWindow("TITLE", 0, 0, ww, wh, wf);
-	if (!grafx_ctx.window) {
+	gfx_ctx.window = SDL_CreateWindow("TITLE", 0, 0, ww, wh, wf);
+	if (!gfx_ctx.window) {
 		DIE("Failed to create SDL window. %s", SDL_GetError());
 	}
-	grafx_ctx.gl_ctx = SDL_GL_CreateContext(grafx_ctx.window);
-	if (!grafx_ctx.gl_ctx) {
+	gfx_ctx.gl_ctx = SDL_GL_CreateContext(gfx_ctx.window);
+	if (!gfx_ctx.gl_ctx) {
 		DIE("Failed to create SDL GL context. %s", SDL_GetError());
 	}
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -88,26 +88,26 @@ void grafx_start(void)
 	glViewport(0, 0, ww, wh);
 }
 
-void grafx_shutdown(void)
+void gfx_shutdown(void)
 {
 	free(display.modes);
-	SDL_GL_DeleteContext(grafx_ctx.gl_ctx);
-	SDL_DestroyWindow(grafx_ctx.window);
+	SDL_GL_DeleteContext(gfx_ctx.gl_ctx);
+	SDL_DestroyWindow(gfx_ctx.window);
 }
 
-void grafx_present_framebuffer(void)
+void gfx_present_framebuffer(void)
 {
-	SDL_GL_SwapWindow(grafx_ctx.window);
+	SDL_GL_SwapWindow(gfx_ctx.window);
 }
 
-void grafx_clear_framebuffer(float r, float g, float b, float a)
+void gfx_clear_framebuffer(float r, float g, float b, float a)
 {
 	// REVIEW: Any drawback to combining these two operations into one func?
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(r, g, b, a);
 }
 
-void grafx_get_window_size(int32_t *x, int32_t *y)
+void gfx_get_window_size(int32_t *x, int32_t *y)
 {
-	SDL_GetWindowSize(grafx_ctx.window, x, y);
+	SDL_GetWindowSize(gfx_ctx.window, x, y);
 }
