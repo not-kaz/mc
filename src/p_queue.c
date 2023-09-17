@@ -7,11 +7,11 @@
 #define P_QUEUE_DEFAULT_SIZE 4
 #define P_QUEUE_MULTIPLY_FACTOR 2
 
-/* OPTIMIZE: Current implementation of prority queue is a heap object. *
- * This could lead to performance issues with constant mem allocating. *
+/* OPTIMIZE: Current implementation of prority queue is a heap object.   *
+ * This could lead to performance issues with constant mem allocating.   *
  * However, this allows us to have a hidden implementation w/ interface. */
 
-/* HACK: Push and pop functions is copied from rosettacode.org. *
+/* HACK: Push and pop functions is copied from rosettacode.org.   *
  * Write a clean version and try to understand what is happening. */
 
 /* TODO: Add graceful error handling and logging. */

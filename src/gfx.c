@@ -10,8 +10,8 @@
 #define SAFE_MODE_WIN_WIDTH 800
 #define SAFE_MODE_WIN_HEIGHT 600
 
-/* TODO: Add a bitwise flag that keeps track of graphics state.
- *	 Fullscreen, safe mode etc... */
+/* TODO: Add a bitwise flag that keeps track of graphics state. *
+ *	 Fullscreen, safe mode etc...                               */
 static struct {
 	struct SDL_Window *window;
 	struct SDL_GLContext *gl_ctx;

@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+/* REVIEW: Is it worth typedefing for GL related work? 
+		   Does it add extra confusion? */
 typedef unsigned int gfx_shader_t;
 typedef unsigned int gfx_buffer_t;
 
