@@ -1,4 +1,4 @@
-#include "grafx.h"
+#include "gfx.h"
 
 #include "log.h"
 #include "types.h"

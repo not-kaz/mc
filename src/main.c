@@ -1,5 +1,5 @@
 #include "common.h"
-#include "grafx.h"
+#include "gfx.h"
 #include "input.h"
 #include "list.h"
 #include "log.h"
