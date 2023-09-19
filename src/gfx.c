@@ -10,12 +10,12 @@
 #define SAFE_MODE_WIN_WIDTH 800
 #define SAFE_MODE_WIN_HEIGHT 600
 
-/* TODO: Add a bitwise flag that keeps track of graphics state. *
- *	 Fullscreen, safe mode etc...                               */
+/* TODO: Add a bit-wise flag that keeps track of graphics state. *
+ *	 Fullscreen, safe mode etc...                            */
 static struct {
 	struct SDL_Window *window;
 	struct SDL_GLContext *gl_ctx;
-	int32_t is_safe_mode;
+	int is_safe_mode;
 } gfx_ctx = {NULL, NULL, 1};
 
 static struct {
@@ -32,7 +32,7 @@ static void get_display_modes(void)
 	display.modes = malloc(sizeof(SDL_DisplayMode)
 		* (size_t)(display.num_modes));
 	if (!display.modes) {
-		DIE("Failed to allocate mem for display data.");
+		DIE("Failed to allocate memory for display data.");
 	}
 	LOG("=== DETECTED DISPLAY MODES ===");
 	for (int i = 0; i < display.num_modes; i++) {
@@ -53,14 +53,13 @@ void gfx_start(void)
 	int ww, wh;
 	unsigned int wf;
 
-	// FIXME: SDL_WasInit(0) doesn't seem right. Read doc how handle this.
-	if (!(SDL_WasInit(0)) || gfx_ctx.window || gfx_ctx.gl_ctx) {
+	if (gfx_ctx.window || gfx_ctx.gl_ctx) {
 		return;
 	}
 	ww = SAFE_MODE_WIN_WIDTH;
 	wh = SAFE_MODE_WIN_HEIGHT;
 	wf = SDL_WINDOW_OPENGL;
-	get_display_modes(); // TODO: Find a better name for this func.
+	get_display_modes(); // TODO: Find a better name for this function.
 	if (!gfx_ctx.is_safe_mode) {
 		ww = display.modes[display.num_modes - 1].w;
 		wh = display.modes[display.num_modes - 1].h;
@@ -80,6 +79,7 @@ void gfx_start(void)
 		SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	// TODO: Make SDL_SetSwapInterval() optional and read value from config.
 	SDL_GL_SetSwapInterval(1);
 	if (!gladLoadGL((GLADloadfunc)(SDL_GL_GetProcAddress))) {
 		DIE("Failed to start 'glad' OpenGL loader.");
@@ -102,7 +102,7 @@ void gfx_present_framebuffer(void)
 
 void gfx_clear_framebuffer(float r, float g, float b, float a)
 {
-	// REVIEW: Any drawback to combining these two operations into one func?
+	// REVIEW: Any drawback to combining these two operations into one?
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(r, g, b, a);
 }
