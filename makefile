@@ -8,8 +8,9 @@ CF = -Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes \
      -Wpointer-arith -Wcast-qual
 LF = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 DF = -DDEBUG_MODE
-INC = -Iinclude -Ilib/glad/include
-SRC = $(wildcard src/*.c) $(wildcard lib/glad/src/*.c)
-
+INC = -Iinclude -Ilib/glad/include -Ilib/cglm/include
+SRC = $(wildcard src/*.c) $(wildcard lib/glad/src/*.c) \
+      $(wildcard lib/cglm/src/*.c)
+ 
 all: $(SC)
 	$(CC) -g $(CF) $(INC) $(SRC) $(DF) $(LF) 
