@@ -65,7 +65,8 @@ void gfx_start(void)
 		wh = display.modes[display.num_modes - 1].h;
 		wf |= SDL_WINDOW_FULLSCREEN;
 	}
-	gfx_ctx.window = SDL_CreateWindow("TITLE", 0, 0, ww, wh, wf);
+	gfx_ctx.window = SDL_CreateWindow("TITLE", SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED, ww, wh, wf);
 	if (!gfx_ctx.window) {
 		DIE("Failed to create SDL window. %s", SDL_GetError());
 	}
@@ -103,8 +104,8 @@ void gfx_present_framebuffer(void)
 void gfx_clear_framebuffer(float r, float g, float b, float a)
 {
 	// REVIEW: Any drawback to combining these two operations into one?
-	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(r, g, b, a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void gfx_get_window_size(int32_t *x, int32_t *y)
