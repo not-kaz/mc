@@ -7,10 +7,12 @@
 
 #include <glad/gl.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-#define SDL_INIT_FLAGS (SDL_INIT_VIDEO)
+#define SDL_INIT_FLAG (SDL_INIT_VIDEO)
+#define IMG_INIT_FLAG (IMG_INIT_JPG | IMG_INIT_PNG)
 
-static void startup(void)
+static void game_startup(void)
 {
 	if ((SDL_WasInit(SDL_INIT_FLAGS) & SDL_INIT_FLAGS)) {
 		return;
@@ -18,30 +20,30 @@ static void startup(void)
 	if (SDL_Init(SDL_INIT_FLAGS) != 0) {
 		DIE("Failed to initialize SDL. %s", SDL_GetError());
 	}
-	grafx_start();
+	if (IMG_Init(IMG_INIT_FLAG) != IMG_INIT_FLAG) {
+		DIE("Failed to initialize SDL image lib. %s", IMG_GetError());
+	}
+	gfx_start();
 }
 
-static void shutdown(void)
+static void game_shutdown(void)
 {
-	grafx_shutdown();
+	gfx_shutdown();
+	IMG_Quit();
 	SDL_Quit();
 }
 
 int main(int argc, char **argv)
 {
-	int x, y;
-
-	startup();
 	UNUSED(argc);
 	UNUSED(argv);
-	startup();
-	grafx_get_window_size(&x, &y);
+	game_startup();
 	while (1) {
 		SDL_Delay(88);
-		grafx_clear_framebuffer(0.3f, 0.2f, 0.3f, 1.0f);
-		grafx_present_framebuffer();
+		gfx_clear_framebuffer(0.3f, 0.2f, 0.3f, 1.0f);
+		gfx_present_framebuffer();
 		input_poll_events();
 	}
-	shutdown();
+	game_shutdown();
 	return 0;
 }
