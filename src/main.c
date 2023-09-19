@@ -14,10 +14,10 @@
 
 static void game_startup(void)
 {
-	if ((SDL_WasInit(SDL_INIT_FLAGS) & SDL_INIT_FLAGS)) {
+	if ((SDL_WasInit(SDL_INIT_FLAG) & SDL_INIT_FLAG)) {
 		return;
 	}
-	if (SDL_Init(SDL_INIT_FLAGS) != 0) {
+	if (SDL_Init(SDL_INIT_FLAG) != 0) {
 		DIE("Failed to initialize SDL. %s", SDL_GetError());
 	}
 	if (IMG_Init(IMG_INIT_FLAG) != IMG_INIT_FLAG) {
