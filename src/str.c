@@ -1,5 +1,6 @@
 #include "str.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,7 +46,7 @@ char *str_read_file(const char *filename)
 		return NULL;
 	}
 	fseek(fp, 0, SEEK_END);
-	len = ftell(fp);
+	len = (size_t)(ftell(fp));
 	fseek(fp, 0, SEEK_SET);
 	src = calloc(len + 1, sizeof(char));
 	if (!src) {

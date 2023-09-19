@@ -3,6 +3,6 @@
 
 char *str_duplicate(char *str);
 char *str_split(char **str_p, const char *delim);
-char *str_read_file(char *filename);
+char *str_read_file(const char *filename);
 
 #endif
