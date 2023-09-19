@@ -36,7 +36,7 @@ static unsigned int compile_shader(const char *fp, GLenum type)
 	return sh;
 }
 
-unsigned int shader_create(const char *vsrc, const char *fsrc)
+unsigned int shader_build(const char *vsrc, const char *fsrc)
 {
 	unsigned int sp, vs, fs;
 	int res;
