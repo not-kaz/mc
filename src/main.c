@@ -1,3 +1,4 @@
+#include "camera.h"
 #include "cube.h"
 #include "common.h"
 #include "gfx.h"
@@ -16,6 +17,8 @@
 
 #define SDL_INIT_FLAG (SDL_INIT_VIDEO)
 #define IMG_INIT_FLAG (IMG_INIT_JPG | IMG_INIT_PNG)
+
+/* TODO: Replace CGLM with a light alternative or make a minimal math header. */
 
 static void game_startup(void)
 {
@@ -44,6 +47,7 @@ int main(int argc, char **argv)
 	unsigned int tex;
 	int ww, wh;
 	struct mesh block;
+	struct camera cam;
 
 	UNUSED(argc);
 	UNUSED(argv);
@@ -58,16 +62,18 @@ int main(int argc, char **argv)
 	mesh_assign_attr(&block, "tex_coord_attr", 2);
 	mesh_process_attr_layout(&block);
 	mesh_bind(&block);
+	camera_init(&cam);
 	while (1) {
-		mat4 model, view, projection;
+		mat4 model, projection, view;
+
 		glm_mat4_identity(model);
-		glm_mat4_identity(view);
 		glm_mat4_identity(projection);
+		glm_mat4_identity(view);
 		glm_rotate(model, ((float)(SDL_GetTicks()) / 1000.0f)
 			* glm_rad(50.0f), (vec3){0.5f, 1.0f, 0.0f});
 		glm_perspective(glm_rad(45.0f), ww / wh, 0.1f, 100.0f,
 			projection);
-		glm_translate(view, (vec3){0.0f, 0.0f, -3.0f});
+		camera_calc_view_matrix(&cam, view);
 		shader_set_mat4f(shd, "model", model[0]);
 		shader_set_mat4f(shd, "view", view[0]);
 		shader_set_mat4f(shd, "projection", projection[0]);
@@ -75,6 +81,7 @@ int main(int argc, char **argv)
 		mesh_draw(&block);
 		gfx_present_framebuffer();
 		input_poll_events();
+		camera_update(&cam);
 	}
 	game_shutdown();
 	return 0;
