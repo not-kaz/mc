@@ -5,6 +5,8 @@
 
 #include <glad/gl.h>
 
+/* TODO: Add an OpenGL index buffer and handle drawing with indices. */
+
 void mesh_init(struct mesh *mesh, float *vertices, size_t size)
 {
 	if (!mesh || !vertices || !size) {
