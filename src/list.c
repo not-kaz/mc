@@ -87,24 +87,6 @@ void *list_pop_front(struct list *list)
 	free(list->head);
 	list->head = tmp;
 	return data;
-
-	/*if (!list->head) {
-		return NULL;
-	}
-	if (!list->head->next) {
-		data = list->head->data;
-		free(list->head);
-		list->head = NULL;
-		return data;
-	}
-	tmp = list->head->next;
-	tmp->prev = NULL;
-	list->head->prev = NULL;
-	list->head->next = NULL;
-	data = list->head->data;
-	free(list->head);
-	list->head = tmp;
-	return data;*/
 }
 
 bool list_contains(struct list *list, void *data)
