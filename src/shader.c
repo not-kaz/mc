@@ -13,21 +13,24 @@
  *  	 Assign names to shaders and use those to access them when needed. */
 
 /* TODO: Implement missing error handling in compile_shader(). */
+
 static unsigned int compile_shader(const char *fp, GLenum type)
 {
 	int res;
 	unsigned int sh;
-	const char *src;
+	char *src;
+	const char *tmp[1]; // Required for glShaderSource().
 	char msg[MSG_MAX_LEN];
 
 	src = str_read_file(fp);
 	if (!src) {
 		DIE("Failed to read shader source file. '%s'", fp);
 	}
+	tmp[0] = src;
 	sh = glCreateShader(type);
-	glShaderSource(sh, 1, &src, NULL);
+	glShaderSource(sh, 1, tmp, NULL);
 	glCompileShader(sh);
-	free((char *)(src)); // HACK: Casting to allow freeing a const variable.
+	free(src);
 	glGetShaderiv(sh, GL_COMPILE_STATUS, &res);
 	if (!res) {
 		glGetShaderInfoLog(sh, MSG_MAX_LEN, NULL, msg);
