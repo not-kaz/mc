@@ -49,6 +49,9 @@ struct camera *camera_create(void)
 	struct camera *cam;
 
 	cam = malloc(sizeof(struct camera));
+	if (!cam) {
+		return NULL;
+	}
 	cam->pos[COORD_X] = 0.0f;
 	cam->pos[COORD_Y] = 0.0f;
 	cam->pos[COORD_Z] = 5.0f;
