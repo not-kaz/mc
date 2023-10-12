@@ -3,14 +3,44 @@
 #include "common.h"
 #include "log.h"
 
+#include <stdlib.h>
+
 #include <glad/gl.h>
+
+#define MAX_NUM_BUFFER_ATTRIBUTES 32
+
+struct vertex_attribute {
+	const char *name;
+	int offset;
+	int num_components;
+};
+
+struct vertex_buffer {
+	float *data;
+	size_t size;
+	struct vertex_attribute attrs[MAX_NUM_BUFFER_ATTRIBUTES];
+	int stride;
+	unsigned int index;
+	unsigned int id;
+};
+
+struct mesh {
+	struct vertex_buffer buffer;
+	unsigned int attr_binding_id;
+};
 
 /* TODO: Add an OpenGL index buffer and handle drawing with indices. */
 
-void mesh_init(struct mesh *mesh, float *vertices, size_t size)
+struct mesh *mesh_create(float *vertices, size_t size)
 {
-	if (!mesh || !vertices || !size) {
-		return;
+	struct mesh *mesh;
+
+	if (!vertices || !size) {
+		return NULL;
+	}
+	mesh = malloc(sizeof(struct mesh));
+	if (!mesh) {
+		return NULL;
 	}
 	mesh->buffer.data = vertices;
 	mesh->buffer.size = size;
@@ -28,11 +58,12 @@ void mesh_init(struct mesh *mesh, float *vertices, size_t size)
 	glBufferData(GL_ARRAY_BUFFER, (int64_t)(size), vertices, GL_STATIC_DRAW);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return mesh;
 }
 
-void mesh_finish(struct mesh *mesh)
+void mesh_destroy(struct mesh *mesh)
 {
-	UNUSED(mesh); // TODO: Implement if necessary.
+	free(mesh);
 }
 
 void mesh_assign_attr(struct mesh *mesh, const char *name, int num_components)
@@ -48,7 +79,7 @@ void mesh_assign_attr(struct mesh *mesh, const char *name, int num_components)
 void mesh_process_attr_layout(struct mesh *mesh)
 {
 	int offset;
-	struct _vertex_attribute *attr;
+	struct vertex_attribute *attr;
 
 	if (!mesh) {
 		return;

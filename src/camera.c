@@ -1,6 +1,7 @@
 #include "camera.h"
 
 #include <math.h>
+#include <stdlib.h>
 
 #include <cglm/cglm.h>
 
@@ -12,10 +13,23 @@
 #define DEFAULT_MOVE_SPEED 2.5f
 #define DEFAULT_SENS 0.1f
 
-enum 	 {
+enum COORD_SUBSCRIPT {
 	COORD_X = 0,
 	COORD_Y = 1,
 	COORD_Z = 2
+};
+
+struct camera {
+	vec3 pos;
+	vec3 front;
+	vec3 up;
+	vec3 right;
+	vec3 world_up;
+	mat4 view;
+	float yaw;
+	float pitch;
+	float move_speed;
+	float sens;
 };
 
 static void update_cam_vectors(struct camera *cam)
@@ -30,8 +44,19 @@ static void update_cam_vectors(struct camera *cam)
 	glm_vec3_crossn(cam->right, cam->front, cam->up);
 }
 
-void camera_init(struct camera *cam)
+static void calc_view_matrix(struct camera *cam)
 {
+	vec3 center;
+
+	glm_vec3_add(cam->pos, cam->front, center);
+	glm_lookat(cam->pos, center, cam->up, cam->view);
+}
+
+struct camera *camera_create(void)
+{
+	struct camera *cam;
+
+	cam = malloc(sizeof(struct camera));
 	cam->pos[COORD_X] = 0.0f;
 	cam->pos[COORD_Y] = 0.0f;
 	cam->pos[COORD_Z] = 5.0f;
@@ -49,6 +74,12 @@ void camera_init(struct camera *cam)
 	cam->move_speed = DEFAULT_MOVE_SPEED;
 	cam->sens = DEFAULT_SENS;
 	update_cam_vectors(cam);
+	return cam;
+}
+
+void camera_destroy(struct camera *cam)
+{
+	free(cam);
 }
 
 void camera_update(struct camera *cam)
