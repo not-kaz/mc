@@ -91,7 +91,7 @@ void camera_update(struct camera *cam)
 	// Yaw = std::fmod((Yaw + xoffset), (GLfloat)360.0f);
 }
 
-void camera_calc_view_matrix(struct camera *cam, mat4 view_out)
+void camera_calc_view_matrix(struct camera *cam, float view_out[4][4])
 {
 	vec3 center;
 
