@@ -5,9 +5,6 @@
 
 #include <cglm/cglm.h>
 
-#define GLM_X 0
-#define GLM_Y 1
-#define GLM_Z 2
 #define INITAL_YAW -90.0f
 #define INITAL_PITCH 0.0f
 #define DEFAULT_MOVE_SPEED 2.5f
