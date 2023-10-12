@@ -46,8 +46,8 @@ int main(int argc, char **argv)
 	unsigned int shd;
 	unsigned int tex;
 	int ww, wh;
-	struct mesh block;
-	struct camera cam;
+	struct mesh *block;
+	struct camera *cam;
 
 	UNUSED(argc);
 	UNUSED(argv);
@@ -57,14 +57,14 @@ int main(int argc, char **argv)
 	texture_build(&tex, "assets\\container.jpg");
 	shader_use(shd);
 	texture_bind(&tex);
-	mesh_init(&block, cube, sizeof(cube));
-	mesh_assign_attr(&block, "pos_attr", 3);
-	mesh_assign_attr(&block, "tex_coord_attr", 2);
-	mesh_process_attr_layout(&block);
-	mesh_bind(&block);
-	camera_init(&cam);
+	block = mesh_create(cube, sizeof(cube));
+	mesh_assign_attr(block, "pos_attr", 3);
+	mesh_assign_attr(block, "tex_coord_attr", 2);
+	mesh_process_attr_layout(block);
+	mesh_bind(block);
+	cam = camera_create();
 	while (1) {
-		mat4 model, projection, view;
+		mat4 model, view, projection;
 
 		glm_mat4_identity(model);
 		glm_mat4_identity(projection);
@@ -73,15 +73,15 @@ int main(int argc, char **argv)
 			* glm_rad(50.0f), (vec3){0.5f, 1.0f, 0.0f});
 		glm_perspective(glm_rad(45.0f), ww / wh, 0.1f, 100.0f,
 			projection);
-		camera_calc_view_matrix(&cam, view);
+		camera_calc_view_matrix(cam, view);
 		shader_set_mat4f(shd, "model", model[0]);
 		shader_set_mat4f(shd, "view", view[0]);
 		shader_set_mat4f(shd, "projection", projection[0]);
 		gfx_clear_framebuffer(0.3f, 0.6f, 0.9f, 1.0f);
-		mesh_draw(&block);
+		mesh_draw(block);
 		gfx_present_framebuffer();
 		input_poll_events();
-		camera_update(&cam);
+		camera_update(cam);
 	}
 	game_shutdown();
 	return 0;
