@@ -44,14 +44,6 @@ static void update_cam_vectors(struct camera *cam)
 	glm_vec3_crossn(cam->right, cam->front, cam->up);
 }
 
-static void calc_view_matrix(struct camera *cam)
-{
-	vec3 center;
-
-	glm_vec3_add(cam->pos, cam->front, center);
-	glm_lookat(cam->pos, center, cam->up, cam->view);
-}
-
 struct camera *camera_create(void)
 {
 	struct camera *cam;
