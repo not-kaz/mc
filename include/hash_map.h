@@ -1,7 +1,7 @@
 #ifndef HASH_MAP_H
 #define HASH_MAP_H
 
-#include <stdint.h>
+#include "types.h"
 
 #define HASH_MAP_INSERT(map, key, val) hash_map_insert(map, key, (void *)(val))
 #define HASH_MAP_AT(map, key, val) hash_map_at(map, key, (void *)&(val))

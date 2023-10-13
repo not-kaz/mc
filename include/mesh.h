@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <stddef.h>
+#include "types.h"
 
 struct mesh *mesh_create(float *vertices, size_t size);
 void mesh_destroy(struct mesh *mesh);

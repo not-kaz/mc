@@ -3,10 +3,6 @@
 
 #include "types.h"
 
-/* REVIEW: Is it worth typedefing for GL related work? *
- *         Does it add extra confusion?                */
-typedef unsigned int gfx_buffer_t;
-
 void gfx_start(void);
 void gfx_shutdown(void);
 void gfx_present_framebuffer(void);
