@@ -1,13 +1,16 @@
 #include "camera.h"
 
+#include "input.h"
+
 #include <math.h>
 #include <stdlib.h>
 
+#include <SDL2/SDL_scancode.h>
 #include <cglm/cglm.h>
 
 #define INITAL_YAW -90.0f
 #define INITAL_PITCH 0.0f
-#define DEFAULT_MOVE_SPEED 2.5f
+#define DEFAULT_MOVE_SPEED 0.01f
 #define DEFAULT_SENS 0.1f
 
 enum COORD_SUBSCRIPT {
@@ -74,9 +77,28 @@ void camera_destroy(struct camera *cam)
 	free(cam);
 }
 
-void camera_update(struct camera *cam)
+// HACKME: I do not like how we pass key states into camera to handle move here.
+// FIXME: Add delta-time arg variable to decouple movement from frame-rate.
+void camera_update(struct camera *cam, const uint8_t *key_states)
 {
-	cam->pos[COORD_Z] += 0.01f;
+	if (keypress[SDL_SCANCODE_A]) {
+		cam->pos[COORD_X] -= cam->move_speed;
+	}
+	if (keypress[SDL_SCANCODE_D]) {
+		cam->pos[COORD_X] += cam->move_speed;
+	}
+	if (keypress[SDL_SCANCODE_W]) {
+		cam->pos[COORD_Z] -= cam->move_speed;
+	}
+	if (keypress[SDL_SCANCODE_S]) {
+		cam->pos[COORD_Z] += cam->move_speed;
+	}
+	if (keypress[SDL_SCANCODE_SPACE]) {
+		cam->pos[COORD_Y] += cam->move_speed;
+	}
+	if (keypress[SDL_SCANCODE_LCTRL]) {
+		cam->pos[COORD_Y] -= cam->move_speed;
+	}
 	// If we don't constrain the yaw to only use values between 0-360
 	// we would lose floating precission with very high values, hence
 	// the movement would look like big "steps" instead a smooth one!

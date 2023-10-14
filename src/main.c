@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 	int ww, wh;
 	struct mesh *block;
 	struct camera *cam;
+	const uint8_t *keystates;
 
 	UNUSED(argc);
 	UNUSED(argv);
@@ -62,6 +63,7 @@ int main(int argc, char **argv)
 	mesh_process_attr_layout(block);
 	mesh_bind(block);
 	cam = camera_create();
+	keystates = NULL;
 	while (1) {
 		mat4 model, view, projection;
 
@@ -76,11 +78,11 @@ int main(int argc, char **argv)
 		shader_set_mat4f(shd, "model", model[0]);
 		shader_set_mat4f(shd, "view", view[0]);
 		shader_set_mat4f(shd, "projection", projection[0]);
-		gfx_clear_framebuffer(0.3f, 0.6f, 0.9f, 1.0f);
+		gfx_clear_framebuffer(0.0f, 0.0f, 0.0f, 1.0f);
 		mesh_draw(block);
 		gfx_present_framebuffer();
-		input_poll_events();
-		camera_update(cam);
+		input_poll_events(&keystates);
+		camera_update(cam, keystates);
 	}
 	game_shutdown();
 	return 0;
