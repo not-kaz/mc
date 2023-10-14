@@ -81,22 +81,22 @@ void camera_destroy(struct camera *cam)
 // FIXME: Add delta-time arg variable to decouple movement from frame-rate.
 void camera_update(struct camera *cam, const uint8_t *key_states)
 {
-	if (keypress[SDL_SCANCODE_A]) {
-		cam->pos[COORD_X] -= cam->move_speed;
+	if (key_states[SDL_SCANCODE_A]) {
+		cam->pos[COORD_X] -= cam->move_speed;\
 	}
-	if (keypress[SDL_SCANCODE_D]) {
+	if (key_states[SDL_SCANCODE_D]) {
 		cam->pos[COORD_X] += cam->move_speed;
 	}
-	if (keypress[SDL_SCANCODE_W]) {
+	if (key_states[SDL_SCANCODE_W]) {
 		cam->pos[COORD_Z] -= cam->move_speed;
 	}
-	if (keypress[SDL_SCANCODE_S]) {
+	if (key_states[SDL_SCANCODE_S]) {
 		cam->pos[COORD_Z] += cam->move_speed;
 	}
-	if (keypress[SDL_SCANCODE_SPACE]) {
+	if (key_states[SDL_SCANCODE_SPACE]) {
 		cam->pos[COORD_Y] += cam->move_speed;
 	}
-	if (keypress[SDL_SCANCODE_LCTRL]) {
+	if (key_states[SDL_SCANCODE_LCTRL]) {
 		cam->pos[COORD_Y] -= cam->move_speed;
 	}
 	// If we don't constrain the yaw to only use values between 0-360
