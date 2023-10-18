@@ -33,8 +33,7 @@ void input_poll_events(void)
 	}
 }
 
-// HACKME: Use a ternary if statement to return true/false bool instead of u8.
-bool input_is_keybind_pressed(enum input_keybind_tag keybind)
+bool input_is_keybind_pressed(enum input_keybind_tag bind)
 {
-	return keyboard_state[keybinds[keybind].scancode] ? true : false;
+	return keyboard_state[keybinds[bind].scancode] ? true : false;
 }

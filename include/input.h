@@ -14,6 +14,6 @@ enum input_keybind_tag {
 };
 
 void input_poll_events(void);
-bool input_is_keybind_pressed(enum input_keybind_tag keybind);
+bool input_is_keybind_pressed(enum input_keybind_tag bind);
 
 #endif
