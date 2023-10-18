@@ -13,7 +13,7 @@
 #define DEFAULT_MOVE_SPEED 0.01f
 #define DEFAULT_SENS 0.1f
 
-enum COORD_SUBSCRIPT {
+enum coord_subscript {
 	COORD_X = 0,
 	COORD_Y = 1,
 	COORD_Z = 2
@@ -79,24 +79,24 @@ void camera_destroy(struct camera *cam)
 
 // HACKME: I do not like how we pass key states into camera to handle move here.
 // FIXME: Add delta-time arg variable to decouple movement from frame-rate.
-void camera_update(struct camera *cam, const uint8_t *key_states)
+void camera_update(struct camera *cam)
 {
-	if (key_states[SDL_SCANCODE_A]) {
-		cam->pos[COORD_X] -= cam->move_speed;\
+	if (input_is_keybind_pressed(KEYBIND_LEFT)) {
+		cam->pos[COORD_X] -= cam->move_speed;
 	}
-	if (key_states[SDL_SCANCODE_D]) {
+	if (input_is_keybind_pressed(KEYBIND_RIGHT)) {
 		cam->pos[COORD_X] += cam->move_speed;
 	}
-	if (key_states[SDL_SCANCODE_W]) {
+	if (input_is_keybind_pressed(KEYBIND_FORWARD)) {
 		cam->pos[COORD_Z] -= cam->move_speed;
 	}
-	if (key_states[SDL_SCANCODE_S]) {
+	if (input_is_keybind_pressed(KEYBIND_BACKWARD)) {
 		cam->pos[COORD_Z] += cam->move_speed;
 	}
-	if (key_states[SDL_SCANCODE_SPACE]) {
+	if (input_is_keybind_pressed(KEYBIND_JUMP)) {
 		cam->pos[COORD_Y] += cam->move_speed;
 	}
-	if (key_states[SDL_SCANCODE_LCTRL]) {
+	if (input_is_keybind_pressed(KEYBIND_CROUCH)) {
 		cam->pos[COORD_Y] -= cam->move_speed;
 	}
 	// If we don't constrain the yaw to only use values between 0-360
