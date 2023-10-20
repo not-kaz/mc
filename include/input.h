@@ -15,5 +15,6 @@ enum input_keybind_tag {
 
 void input_poll_events(void);
 bool input_is_keybind_pressed(enum input_keybind_tag bind);
+void input_get_relative_mouse_position(int *x, int *y);
 
 #endif
