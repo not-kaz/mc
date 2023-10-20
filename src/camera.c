@@ -1,6 +1,8 @@
 #include "camera.h"
 
+#include "common.h"
 #include "input.h"
+#include "log.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -10,7 +12,7 @@
 
 #define INITAL_YAW -90.0f
 #define INITAL_PITCH 0.0f
-#define DEFAULT_MOVE_SPEED 0.01f
+#define DEFAULT_MOVE_SPEED 0.1f
 #define DEFAULT_SENS 0.1f
 
 enum coord_subscript {
@@ -42,6 +44,53 @@ static void update_cam_vectors(struct camera *cam)
 	glm_vec3_normalize(cam->front);
 	glm_vec3_crossn(cam->front, cam->world_up, cam->right);
 	glm_vec3_crossn(cam->right, cam->front, cam->up);
+}
+
+static void handle_rotation(struct camera *cam)
+{
+	int32_t mx, my;
+
+	input_get_relative_mouse_position(&mx, &my);
+	cam->yaw = fmodf((cam->yaw + ((float)(mx) * DEFAULT_SENS)), 360.0f);
+	cam->pitch -= ((float)(my) * DEFAULT_SENS);
+        if (cam->pitch > 89.0f) {
+		cam->pitch = 89.0f;
+        }
+        if (cam->pitch < -89.0f) {
+                cam->pitch = -89.0f;
+        }
+	// cam->pitch = fminf(cam->pitch, fmax(89.0f, -89.0f));
+	update_cam_vectors(cam);
+}
+
+static void handle_movement(struct camera *cam)
+{
+	vec3 tmp;
+
+	if (input_is_keybind_pressed(KEYBIND_LEFT)) {
+		glm_vec3_scale(cam->right, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_sub(cam->pos, tmp, cam->pos);
+	}
+	if (input_is_keybind_pressed(KEYBIND_RIGHT)) {
+		glm_vec3_scale(cam->right, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_add(cam->pos, tmp, cam->pos);
+	}
+	if (input_is_keybind_pressed(KEYBIND_FORWARD)) {
+		glm_vec3_scale(cam->front, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_add(cam->pos, tmp, cam->pos);
+	}
+	if (input_is_keybind_pressed(KEYBIND_BACKWARD)) {
+		glm_vec3_scale(cam->front, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_sub(cam->pos, tmp, cam->pos);
+	}
+	if (input_is_keybind_pressed(KEYBIND_JUMP)) {
+		glm_vec3_scale(cam->up, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_add(cam->pos, tmp, cam->pos);
+	}
+	if (input_is_keybind_pressed(KEYBIND_CROUCH)) {
+		glm_vec3_scale(cam->upmake, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_sub(cam->pos, tmp, cam->pos);
+	}
 }
 
 struct camera *camera_create(void)
@@ -77,32 +126,11 @@ void camera_destroy(struct camera *cam)
 	free(cam);
 }
 
-// HACKME: I do not like how we pass key states into camera to handle move here.
 // FIXME: Add delta-time arg variable to decouple movement from frame-rate.
 void camera_update(struct camera *cam)
 {
-	if (input_is_keybind_pressed(KEYBIND_LEFT)) {
-		cam->pos[COORD_X] -= cam->move_speed;
-	}
-	if (input_is_keybind_pressed(KEYBIND_RIGHT)) {
-		cam->pos[COORD_X] += cam->move_speed;
-	}
-	if (input_is_keybind_pressed(KEYBIND_FORWARD)) {
-		cam->pos[COORD_Z] -= cam->move_speed;
-	}
-	if (input_is_keybind_pressed(KEYBIND_BACKWARD)) {
-		cam->pos[COORD_Z] += cam->move_speed;
-	}
-	if (input_is_keybind_pressed(KEYBIND_JUMP)) {
-		cam->pos[COORD_Y] += cam->move_speed;
-	}
-	if (input_is_keybind_pressed(KEYBIND_CROUCH)) {
-		cam->pos[COORD_Y] -= cam->move_speed;
-	}
-	// If we don't constrain the yaw to only use values between 0-360
-	// we would lose floating precission with very high values, hence
-	// the movement would look like big "steps" instead a smooth one!
-	// Yaw = std::fmod((Yaw + xoffset), (GLfloat)360.0f);
+	handle_rotation(cam);
+	handle_movement(cam);
 }
 
 void camera_calc_view_matrix(struct camera *cam, float view_out[4][4])
