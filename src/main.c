@@ -31,6 +31,8 @@ static void game_startup(void)
 		DIE("Failed to initialize SDL image lib. %s", IMG_GetError());
 	}
 	gfx_start();
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+	SDL_CaptureMouse(SDL_TRUE);
 }
 
 static void game_shutdown(void)
