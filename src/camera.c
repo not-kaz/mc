@@ -88,7 +88,7 @@ static void handle_movement(struct camera *cam)
 		glm_vec3_add(cam->pos, tmp, cam->pos);
 	}
 	if (input_is_keybind_pressed(KEYBIND_CROUCH)) {
-		glm_vec3_scale(cam->upmake, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_scale(cam->up, DEFAULT_MOVE_SPEED, tmp);
 		glm_vec3_sub(cam->pos, tmp, cam->pos);
 	}
 }
@@ -129,6 +129,9 @@ void camera_destroy(struct camera *cam)
 // FIXME: Add delta-time arg variable to decouple movement from frame-rate.
 void camera_update(struct camera *cam)
 {
+	if (!cam) {
+		return;
+	}
 	handle_rotation(cam);
 	handle_movement(cam);
 }
@@ -137,6 +140,9 @@ void camera_calc_view_matrix(struct camera *cam, float view_out[4][4])
 {
 	vec3 center;
 
+	if (!cam) {
+		return;
+	}
 	glm_vec3_add(cam->pos, cam->front, center);
 	glm_lookat(cam->pos, center, cam->up, view_out);
 }
