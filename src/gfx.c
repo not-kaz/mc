@@ -7,8 +7,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define SAFE_MODE_WIN_WIDTH 800
-#define SAFE_MODE_WIN_HEIGHT 600
+#define SAFE_MODE_WIN_WIDTH 1280
+#define SAFE_MODE_WIN_HEIGHT 800
 
 /* TODO: Add a bit-wise flag that keeps track of graphics state. *
  *	 Fullscreen, safe mode etc...                            */
@@ -34,17 +34,10 @@ static void get_display_modes(void)
 	if (!display.modes) {
 		DIE("Failed to allocate memory for display data.");
 	}
-	LOG("=== DETECTED DISPLAY MODES ===");
 	for (int i = 0; i < display.num_modes; i++) {
-		uint32_t fmt;
-
 		if (SDL_GetDisplayMode(0, i, &display.modes[i]) != 0) {
 			DIE("Failed to read display data. %s", SDL_GetError());
 		}
-		fmt = display.modes[i].format;
-		LOG("#%d: %dx%d %d %u %s", i, display.modes[i].w,
-			display.modes[i].h, display.modes[i].refresh_rate,
-			SDL_BITSPERPIXEL(fmt), SDL_GetPixelFormatName(fmt));
 	}
 }
 
