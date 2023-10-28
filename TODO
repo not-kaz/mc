@@ -1,0 +1,10 @@
+~ Decide whether to use unsigned variables where it makes sense or stick with everything signed.
+
+~ Decide on verbose or spartan variable naming scheme. Stop mixing and rename all.
+					-> idx_buf vs index_buffer
+
+~ Consolidate all cube related code into block.c and chunks.c
+
+~ In mesh_create(), if there is no index data arg provided, continue with mesh creation and end up using glDrawArrays() in mesh_draw() instead.
+
+~ Edit code to fit code style.
