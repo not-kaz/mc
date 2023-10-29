@@ -73,7 +73,7 @@ struct mesh *mesh_create(float *vertices, size_t vertices_size,
 	mesh->idx_buf.size = indices_size;
 	mesh->idx_buf.elem_count = (int)((indices_size / sizeof(unsigned int)));
 	mesh->idx_buf.id = 0;
-	for (int i = 0; i < MAX_NUM_vert_buf_ATTRIBUTES; i++) {
+	for (int i = 0; i < MAX_NUM_BUFFER_ATTRIBUTES; i++) {
 		mesh->vert_buf.attrs[i].name = NULL;
 		mesh->vert_buf.attrs[i].offset = 0;
 		mesh->vert_buf.attrs[i].num_comps = 0;
