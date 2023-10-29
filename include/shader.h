@@ -12,7 +12,7 @@ enum shader_uniform_type {
 unsigned int shader_build(const char *vsrc, const char *fsrc);
 void shader_use(unsigned int sh);
 void shader_set_uniform(unsigned int sh, const char *name, const float *val,
-	enum shader_uniform_type type);
+		enum shader_uniform_type type);
 
 #endif
 
