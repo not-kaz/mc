@@ -1,5 +1,5 @@
+#include "block.h"
 #include "camera.h"
-#include "cube.h"
 #include "common.h"
 #include "gfx.h"
 #include "input.h"
@@ -45,9 +45,8 @@ static void game_shutdown(void)
 int main(int argc, char **argv)
 {
 	unsigned int shd;
-	unsigned int tex;
 	int ww, wh;
-	struct mesh *block;
+	struct block blck;
 	struct camera *cam;
 
 	UNUSED(argc);
@@ -55,18 +54,12 @@ int main(int argc, char **argv)
 	game_startup();
 	gfx_get_window_size(&ww, &wh);
 	shd = shader_build("shaders\\vert.glsl", "shaders\\frag.glsl");
-	texture_build(&tex, "assets\\sprites.jpg");
 	shader_use(shd);
-	texture_bind(&tex);
-	block = mesh_create(cube_vertices, sizeof(cube_vertices), cube_elements,
-		sizeof(cube_elements));
-	mesh_assign_attr(block, "pos_attr", 3);
-	mesh_assign_attr(block, "tex_coord_attr", 2);
-	mesh_process_attr_layout(block);
+	block_build_shared_mesh();
+	block_init(&blck, 0, 0);
 	cam = camera_create();
 	while (1) {
 		mat4 model, view, projection;
-		vec2 sprite_idx, sprite_px_size;
 
 		glm_mat4_identity(model);
 		glm_mat4_identity(projection);
@@ -83,29 +76,7 @@ int main(int argc, char **argv)
 		shader_set_uniform(shd, "projection", projection[0],
 			SHADER_UNIFORM_TYPE_MAT4);
 		gfx_clear_framebuffer(0.0f, 0.0f, 0.0f, 1.0f);
-		sprite_idx[0] = 1.0f;
-		sprite_idx[1] = 0.0f;
-		sprite_px_size[0] = 16.0f;
-		sprite_px_size[1] = 16.0f;
-		shader_set_uniform(shd, "sprite_idx", sprite_idx,
-			SHADER_UNIFORM_TYPE_VEC2);
-		shader_set_uniform(shd, "sprite_px_size", sprite_px_size,
-			SHADER_UNIFORM_TYPE_VEC2);
-		mesh_draw(block, 6, 0);
-		mesh_draw(block, 6, 1);
-		mesh_draw(block, 6, 2);
-		mesh_draw(block, 6, 3);
-		sprite_idx[0] = 2.0f;
-		sprite_idx[1] = 0.0f;
-		shader_set_uniform(shd, "sprite_idx", sprite_idx,
-			SHADER_UNIFORM_TYPE_VEC2);
-		mesh_draw(block, 6, 4);
-		sprite_idx[0] = 0.0f;
-		sprite_idx[1] = 0.0f;
-		shader_set_uniform(shd, "sprite_idx", sprite_idx,
-			SHADER_UNIFORM_TYPE_VEC2);
-		mesh_draw(block, 6, 5);
-		//mesh_draw(block);
+		block_draw(&blck, shd);
 		gfx_present_framebuffer();
 		input_poll_events();
 		camera_update(cam);
