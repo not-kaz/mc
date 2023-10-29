@@ -5,4 +5,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
+typedef int flag_t;
+
 #endif
