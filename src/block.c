@@ -1,0 +1,97 @@
+#include "block.h"
+
+#include "cube.h"
+#include "log.h"
+#include "mesh.h"
+#include "shader.h"
+#include "texture.h"
+
+#include <stdlib.h>
+
+#include <cglm/types.h>
+
+#define DEFAULT_TEXTURE_SIZE_PX 16.0f
+
+enum block_face {
+	BLOCK_FACE_FRONT = 0x2,
+	BLOCK_FACE_BACK = 0x4,
+	BLOCK_FACE_LEFT = 0x8,
+	BLOCK_FACE_RIGHT = 0x10,
+	BLOCK_FACE_TOP = 0x20,
+	BLOCK_FACE_BOTTOM = 0x40,
+	BLOCK_FACE_ALL = 0xFF,
+	NUM_BLOCK_FACES = 6
+};
+
+struct block_texture_data {
+	enum block_type block_type;
+	struct {
+		int offset_x;
+		int offset_y;
+	} face[NUM_BLOCK_FACES];
+};
+
+// TODO: Make this customizable, read these values from a json file.
+// Consider a function that returns these values for simplicity.
+struct block_texture_data texture_data[] = {
+	/*     TYPE         FRONT   BACK    LEFT    RIGHT   TOP    BOTTOM */
+	{BLOCK_TYPE_DIRT, {{1, 0}, {1, 0}, {1, 0}, {1, 0}, {2, 0}, {0, 0}}}
+};
+
+struct mesh *block_mesh;
+unsigned int texture_atlas;
+
+// TODO: Change incorrect variable types. We use floats where they don't make sense.
+
+void block_build_shared_mesh(void)
+{
+	// HACK: Figure out a better way of handling this!
+	if (block_mesh) {
+		LOG("Shared block mesh already created. Creating again...");
+		free(block_mesh);
+	}
+	block_mesh = mesh_create(cube_vertices, sizeof(cube_vertices),
+		cube_elements, sizeof(cube_elements));
+	if (!block_mesh) {
+		LOG("Failed to create block mesh.");
+		return;
+	}
+	mesh_assign_attr(block_mesh, "pos_attr", 3);
+	mesh_assign_attr(block_mesh, "tex_coord_attr", 2);
+	mesh_process_attr_layout(block_mesh);
+	texture_build(&texture_atlas, "assets\\sprites.jpg");
+  }
+
+void block_init(struct block *block, int x, int y)
+{
+	if (!block) {
+		return;
+	}
+	block->x = x;
+	block->y = y;
+	block->visible_faces = BLOCK_FACE_ALL;
+	block->type = BLOCK_TYPE_DIRT;
+}
+
+void block_draw(struct block *block, unsigned int shd)
+{
+	// HACK: We don't need these variables. Use the ones from the struct.
+	vec2 offset;
+	vec2 size;
+
+	if (!block) {
+		return;
+	}
+	texture_bind(&texture_atlas);
+	// HACK: This is unreadable and hacky.
+	size[0] = DEFAULT_TEXTURE_SIZE_PX;
+	size[1] = DEFAULT_TEXTURE_SIZE_PX;
+	for (int i = 0; i < NUM_BLOCK_FACES; i++) {
+		offset[0] = texture_data[BLOCK_TYPE_DIRT].face[i].offset_x;
+		offset[1] = texture_data[BLOCK_TYPE_DIRT].face[i].offset_y;
+		// HACK: Does block need it's own shader that we keep locally here.
+		shader_set_uniform(shd, "offset", offset, SHADER_UNIFORM_TYPE_VEC2);
+		shader_set_uniform(shd, "size", size, SHADER_UNIFORM_TYPE_VEC2);
+		mesh_draw(block_mesh, NUM_BLOCK_FACES, i);
+	}
+}
