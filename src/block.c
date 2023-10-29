@@ -87,8 +87,8 @@ void block_draw(struct block *block, unsigned int shd)
 	size[0] = DEFAULT_TEXTURE_SIZE_PX;
 	size[1] = DEFAULT_TEXTURE_SIZE_PX;
 	for (int i = 0; i < NUM_BLOCK_FACES; i++) {
-		offset[0] = texture_data[BLOCK_TYPE_DIRT].face[i].offset_x;
-		offset[1] = texture_data[BLOCK_TYPE_DIRT].face[i].offset_y;
+		offset[0] = texture_data[block->type].face[i].offset_x;
+		offset[1] = texture_data[block->type].face[i].offset_y;
 		// HACK: Does block need it's own shader that we keep locally here.
 		shader_set_uniform(shd, "offset", offset, SHADER_UNIFORM_TYPE_VEC2);
 		shader_set_uniform(shd, "size", size, SHADER_UNIFORM_TYPE_VEC2);
