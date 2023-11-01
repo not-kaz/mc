@@ -67,7 +67,7 @@ void shader_use(unsigned int sh)
 	glUseProgram(sh);
 }
 
-void shader_set_uniform(unsigned int sh, const char *name, const float *val,
+void shader_set_uniform(unsigned int sh, const char *name, const void *val,
 		enum shader_uniform_type type)
 {
 	int loc;
@@ -75,13 +75,19 @@ void shader_set_uniform(unsigned int sh, const char *name, const float *val,
 	loc = glGetUniformLocation(sh, name);
 	switch (type) {
 	case SHADER_UNIFORM_TYPE_MAT4:
-		glUniformMatrix4fv(loc, 1, GL_FALSE, val);
+		glUniformMatrix4fv(loc, 1, GL_FALSE, (const GLfloat *)(val));
 		break;
 	case SHADER_UNIFORM_TYPE_VEC4:
-		glUniform4fv(loc, 1, val);
+		glUniform4fv(loc, 1, (const GLfloat *)(val));
+		break;
+	case SHADER_UNIFORM_TYPE_VEC3:
+		glUniform3fv(loc, 1, (const GLfloat *)(val));
 		break;
 	case SHADER_UNIFORM_TYPE_VEC2:
-		glUniform2fv(loc, 1, val);
+		glUniform2fv(loc, 1, (const GLfloat *)(val));
+		break;
+	case SHADER_UNIFORM_TYPE_IVEC2:
+		glUniform2iv(loc, 1, (const GLint *)(val));
 		break;
 	default:
 		break;
