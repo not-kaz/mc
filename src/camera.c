@@ -84,11 +84,11 @@ static void handle_movement(struct camera *cam)
 		glm_vec3_sub(cam->pos, tmp, cam->pos);
 	}
 	if (input_is_keybind_pressed(KEYBIND_JUMP)) {
-		glm_vec3_scale(cam->up, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_scale(cam->world_up, DEFAULT_MOVE_SPEED, tmp);
 		glm_vec3_add(cam->pos, tmp, cam->pos);
 	}
 	if (input_is_keybind_pressed(KEYBIND_CROUCH)) {
-		glm_vec3_scale(cam->up, DEFAULT_MOVE_SPEED, tmp);
+		glm_vec3_scale(cam->world_up, DEFAULT_MOVE_SPEED, tmp);
 		glm_vec3_sub(cam->pos, tmp, cam->pos);
 	}
 }
