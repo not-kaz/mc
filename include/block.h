@@ -11,13 +11,14 @@ enum block_type {
 };
 
 struct block {
-	int x;
-	int y;
+	float x;
+	float y;
+	float z;
 	flag_t visible_faces;
 	enum block_type type;
 };
 
-void block_init(struct block *block, int x, int y);
+void block_init(struct block *block, float x, float y, float z, enum block_type type);
 void block_build_shared_mesh(void);
 void block_draw(struct block *block, unsigned int shd);
 
