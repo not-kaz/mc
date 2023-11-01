@@ -35,7 +35,8 @@ struct block_texture_data {
 // Consider a function that returns these values for simplicity.
 struct block_texture_data texture_data[] = {
 	/*     TYPE         FRONT   BACK    LEFT    RIGHT   TOP    BOTTOM */
-	{BLOCK_TYPE_DIRT, {{1, 0}, {1, 0}, {1, 0}, {1, 0}, {2, 0}, {0, 0}}}
+	{BLOCK_TYPE_DIRT, {{1, 0}, {1, 0}, {1, 0}, {1, 0}, {2, 0}, {0, 0}}},
+	{BLOCK_TYPE_COBBLE, {{3, 0}, {3, 0}, {3, 0}, {3, 0}, {3, 0}, {3, 0}}}
 };
 
 struct mesh *block_mesh;
@@ -62,22 +63,25 @@ void block_build_shared_mesh(void)
 	texture_build(&texture_atlas, "assets\\sprites.jpg");
   }
 
-void block_init(struct block *block, int x, int y)
+void block_init(struct block *block, float x, float y, float z,
+		enum block_type type)
 {
 	if (!block) {
 		return;
 	}
 	block->x = x;
 	block->y = y;
+	block->z = z;
 	block->visible_faces = BLOCK_FACE_ALL;
-	block->type = BLOCK_TYPE_DIRT;
+	block->type = type;
 }
 
 void block_draw(struct block *block, unsigned int shd)
 {
-	// HACK: We don't need these variables. Use the ones from the struct.
+	// HACK: Do we need these variables? Can't we use struct fields?
 	vec2 offset;
 	vec2 size;
+	vec3 pos;
 
 	if (!block) {
 		return;
@@ -86,12 +90,20 @@ void block_draw(struct block *block, unsigned int shd)
 	// HACK: This is unreadable and hacky.
 	size[0] = DEFAULT_TEXTURE_SIZE_PX;
 	size[1] = DEFAULT_TEXTURE_SIZE_PX;
+	pos[0] = block->x;
+	pos[1] = block->y;
+	pos[2] = block->z;
 	for (int i = 0; i < NUM_BLOCK_FACES; i++) {
-		offset[0] = texture_data[block->type].face[i].offset_x;
-		offset[1] = texture_data[block->type].face[i].offset_y;
-		// HACK: Does block need it's own shader that we keep locally here.
-		shader_set_uniform(shd, "offset", offset, SHADER_UNIFORM_TYPE_VEC2);
-		shader_set_uniform(shd, "size", size, SHADER_UNIFORM_TYPE_VEC2);
+		// HACK: Find out how to avoid these ugly casts.
+		offset[0] = (float)(texture_data[block->type].face[i].offset_x);
+		offset[1] = (float)(texture_data[block->type].face[i].offset_y);
+		// HACK: Pass in shader or keep local shader variable?
+		shader_set_uniform(shd, "offset", offset,
+			SHADER_UNIFORM_TYPE_VEC2);
+		shader_set_uniform(shd, "size", size,
+			SHADER_UNIFORM_TYPE_VEC2);
+		shader_set_uniform(shd, "block_pos", pos,
+			SHADER_UNIFORM_TYPE_VEC3);
 		mesh_draw(block_mesh, NUM_BLOCK_FACES, i);
 	}
 }
