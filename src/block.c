@@ -39,8 +39,8 @@ struct block_texture_data texture_data[] = {
 	{BLOCK_TYPE_COBBLE, {{3, 0}, {3, 0}, {3, 0}, {3, 0}, {3, 0}, {3, 0}}}
 };
 
-struct mesh *block_mesh;
-unsigned int texture_atlas;
+static struct mesh *block_mesh;
+static unsigned int texture_atlas;
 
 // TODO: Change incorrect variable types. We use floats where they don't make sense.
 
