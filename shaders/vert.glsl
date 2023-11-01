@@ -7,9 +7,10 @@ out vec2 tex_coord;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 block_pos;
 
 void main()
-{
-    gl_Position = projection * view * model * vec4(pos_attr, 1);
+{ 
+    gl_Position = projection * view * model * vec4(pos_attr + block_pos, 1);
     tex_coord = vec2(tex_coord_attr.x, tex_coord_attr.y);
 }
