@@ -127,7 +127,7 @@ void mesh_process_attr_layout(struct mesh *mesh)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void mesh_draw(struct mesh *mesh, int elem_count, unsigned int idx_offset)
+void mesh_draw(struct mesh *mesh, int elem_count, int idx_offset)
 {
 	if (!mesh) {
 		return;
@@ -137,7 +137,7 @@ void mesh_draw(struct mesh *mesh, int elem_count, unsigned int idx_offset)
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vert_buf.id);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->idx_buf.id);
 	glDrawElements(GL_TRIANGLES, elem_count, GL_UNSIGNED_INT,
-		(void *)(sizeof(unsigned int) * (idx_offset * elem_count)));
+		(void *)(sizeof(GLuint) * (GLuint)(idx_offset * elem_count)));
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // HACK: Is this necessary?
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // HACK: Is this necessary?
