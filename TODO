@@ -8,3 +8,7 @@
 ~ In mesh_create(), if there is no index data arg provided, continue with mesh creation and end up using glDrawArrays() in mesh_draw() instead.
 
 ~ Edit code to fit code style.
+
+~ Cull block faces that are not visible.
+
+~ Fix all the weird casts we do when passing GLSL uniform values.
