@@ -13,6 +13,7 @@
 #define DEFAULT_TEXTURE_SIZE_PX 16.0f
 
 enum block_face {
+	BLOCK_FACE_NONE = 0x0,
 	BLOCK_FACE_FRONT = 0x2,
 	BLOCK_FACE_BACK = 0x4,
 	BLOCK_FACE_LEFT = 0x8,
@@ -35,7 +36,8 @@ struct block_texture_data {
 // Consider a function that returns these values for simplicity.
 struct block_texture_data texture_data[] = {
 	/*     TYPE         FRONT   BACK    LEFT    RIGHT   TOP    BOTTOM */
-	{BLOCK_TYPE_DIRT, {{1, 0}, {1, 0}, {1, 0}, {1, 0}, {2, 0}, {0, 0}}},
+	{BLOCK_TYPE_DIRT, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}},
+	{BLOCK_TYPE_GRASS, {{1, 0}, {1, 0}, {1, 0}, {1, 0}, {2, 0}, {0, 0}}},
 	{BLOCK_TYPE_COBBLE, {{3, 0}, {3, 0}, {3, 0}, {3, 0}, {3, 0}, {3, 0}}}
 };
 
