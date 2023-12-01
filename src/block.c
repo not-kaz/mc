@@ -16,8 +16,8 @@ enum block_face {
 	BLOCK_FACE_NONE = 0x0,
 	BLOCK_FACE_FRONT = 0x2,
 	BLOCK_FACE_BACK = 0x4,
-	BLOCK_FACE_LEFT = 0x8,
-	BLOCK_FACE_RIGHT = 0x10,
+	BLOCK_FACE_RIGHT = 0x8,
+	BLOCK_FACE_LEFT = 0x10,
 	BLOCK_FACE_TOP = 0x20,
 	BLOCK_FACE_BOTTOM = 0x40,
 	BLOCK_FACE_ALL = 0xFF,
@@ -57,6 +57,7 @@ void block_build_shared_mesh(void)
 		cube_elements, sizeof(cube_elements));
 	if (!block_mesh) {
 		LOG("Failed to create block mesh.");
+		block_mesh = NULL;
 		return;
 	}
 	mesh_assign_attr(block_mesh, "pos_attr", 3);
@@ -65,8 +66,7 @@ void block_build_shared_mesh(void)
 	texture_build(&texture_atlas, "assets\\sprites.jpg");
   }
 
-void block_init(struct block *block, float x, float y, float z,
-		enum block_type type)
+void block_init(struct block *block, int x, int y, int z, enum block_type type)
 {
 	if (!block) {
 		return;
@@ -74,7 +74,8 @@ void block_init(struct block *block, float x, float y, float z,
 	block->x = x;
 	block->y = y;
 	block->z = z;
-	block->visible_faces = BLOCK_FACE_ALL;
+
+	block->visible_faces = BLOCK_FACE_TOP;
 	block->type = type;
 }
 
@@ -92,10 +93,13 @@ void block_draw(struct block *block, unsigned int shd)
 	// HACK: This is unreadable and hacky.
 	size[0] = DEFAULT_TEXTURE_SIZE_PX;
 	size[1] = DEFAULT_TEXTURE_SIZE_PX;
-	pos[0] = block->x;
-	pos[1] = block->y;
-	pos[2] = block->z;
+	pos[0] = (float)(block->x);
+	pos[1] = (float)(block->y);
+	pos[2] = (float)(block->z);
 	for (int i = 0; i < NUM_BLOCK_FACES; i++) {
+       	 	if (!(block->visible_faces & (1 << i))) {
+         	   continue;
+        	}
 		// HACK: Find out how to avoid these ugly casts.
 		offset[0] = (float)(texture_data[block->type].face[i].offset_x);
 		offset[1] = (float)(texture_data[block->type].face[i].offset_y);
@@ -106,6 +110,6 @@ void block_draw(struct block *block, unsigned int shd)
 			SHADER_UNIFORM_TYPE_VEC2);
 		shader_set_uniform(shd, "block_pos", pos,
 			SHADER_UNIFORM_TYPE_VEC3);
-		mesh_draw(block_mesh, NUM_BLOCK_FACES, i);
+		mesh_draw(block_mesh, 6, i * 6); // bad name for elem count arg. should be NUM_ELEM_PER_FACE etc.
 	}
 }
