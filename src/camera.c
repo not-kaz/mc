@@ -12,7 +12,7 @@
 
 #define INITAL_YAW -90.0f
 #define INITAL_PITCH 0.0f
-#define DEFAULT_MOVE_SPEED 0.1f
+#define DEFAULT_MOVE_SPEED 0.2f
 #define DEFAULT_SENS 0.1f
 
 enum coord_subscript {
@@ -103,10 +103,10 @@ struct camera *camera_create(void)
 	}
 	cam->pos[COORD_X] = 0.0f;
 	cam->pos[COORD_Y] = 0.0f;
-	cam->pos[COORD_Z] = 5.0f;
+	cam->pos[COORD_Z] = 0.0f;
 	cam->front[COORD_X] = 0.0f;
 	cam->front[COORD_Y] = 0.0f;
-	cam->front[COORD_Z] = -1.0f;
+	cam->front[COORD_Z] = 0.0f;
 	cam->up[COORD_X] = 0.0f;
 	cam->up[COORD_Y] = 1.0f;
 	cam->up[COORD_Z] = 0.0f;
@@ -145,4 +145,10 @@ void camera_calc_view_matrix(struct camera *cam, float view_out[4][4])
 	}
 	glm_vec3_add(cam->pos, cam->front, center);
 	glm_lookat(cam->pos, center, cam->up, view_out);
+}
+
+void camera_get_position(struct camera *cam, vec2 pos_out)
+{
+	pos_out[0] = cam->pos[0];
+	pos_out[1] = cam->pos[2];
 }
