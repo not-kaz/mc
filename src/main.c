@@ -1,5 +1,4 @@
 #include "block.h"
-#include "chunk.h"
 #include "camera.h"
 #include "common.h"
 #include "gfx.h"
@@ -9,6 +8,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "types.h"
+#include "world.h"
 
 #include <cglm/cglm.h>
 #include <glad/gl.h>
@@ -47,8 +47,8 @@ int main(int argc, char **argv)
 {
 	unsigned int shd;
 	int ww, wh;
-	struct chunk *chnk;
 	struct camera *cam;
+	vec2 pp;
 
 	UNUSED(argc);
 	UNUSED(argv);
@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 	shd = shader_build("shaders\\vert.glsl", "shaders\\frag.glsl");
 	shader_use(shd);
 	block_build_shared_mesh();
-	chnk = chunk_create(0, 0);
 	cam = camera_create();
+	world_init();
 	while (1) {
 		mat4 model, view, projection;
 
@@ -66,9 +66,6 @@ int main(int argc, char **argv)
 		glm_mat4_identity(projection);
 		glm_mat4_identity(view);
 		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-		//glm_translate(model, (vec3){cosf((float)(SDL_GetTicks()) / 1000.0f), 0.0f, 0.0f});
-		//glm_rotate(model, ((float)(SDL_GetTicks()) / 1000.0f)
-		//	* glm_rad(50.0f), (vec3){0.5f, 1.0f, 0.0f});
 		glm_perspective(glm_rad(45.0f), (float)(ww) / (float)(wh), 0.1f,
 			100.0f, projection);
 		camera_calc_view_matrix(cam, view);
@@ -78,12 +75,12 @@ int main(int argc, char **argv)
 			SHADER_UNIFORM_TYPE_MAT4);
 		shader_set_uniform(shd, "projection", projection[0],
 			SHADER_UNIFORM_TYPE_MAT4);
-		gfx_clear_framebuffer(0.0f, 0.0f, 0.0f, 1.0f);
-		//block_draw(&blck, shd);
-		chunk_draw(chnk, shd);
-		gfx_present_framebuffer();
 		input_poll_events();
 		camera_update(cam);
+		camera_get_position(cam, pp);
+		gfx_clear_framebuffer(0.2f, 0.5f, 0.5f, 1.0f);
+		world_draw(pp, shd);
+		gfx_present_framebuffer();
 	}
 	game_shutdown();
 	return 0;
