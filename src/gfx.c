@@ -79,6 +79,7 @@ void gfx_start(void)
 		DIE("Failed to start 'glad' OpenGL loader.");
 	}
 	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
 	glViewport(0, 0, ww, wh);
 }
 
