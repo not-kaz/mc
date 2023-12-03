@@ -12,24 +12,12 @@
 
 #define DEFAULT_TEXTURE_SIZE_PX 16.0f
 
-enum block_face {
-	BLOCK_FACE_NONE = 0x0,
-	BLOCK_FACE_FRONT = 0x2,
-	BLOCK_FACE_BACK = 0x4,
-	BLOCK_FACE_RIGHT = 0x8,
-	BLOCK_FACE_LEFT = 0x10,
-	BLOCK_FACE_TOP = 0x20,
-	BLOCK_FACE_BOTTOM = 0x40,
-	BLOCK_FACE_ALL = 0xFF,
-	NUM_BLOCK_FACES = 6
-};
-
 struct block_texture_data {
 	enum block_type block_type;
 	struct {
 		int offset_x;
 		int offset_y;
-	} face[NUM_BLOCK_FACES];
+	} face[6];
 };
 
 // TODO: Make this customizable, read these values from a json file.
@@ -74,8 +62,7 @@ void block_init(struct block *block, int x, int y, int z, enum block_type type)
 	block->x = x;
 	block->y = y;
 	block->z = z;
-
-	block->visible_faces = BLOCK_FACE_TOP;
+	block->visible_faces = BLOCK_FACE_NONE;
 	block->type = type;
 }
 
@@ -96,7 +83,7 @@ void block_draw(struct block *block, unsigned int shd)
 	pos[0] = (float)(block->x);
 	pos[1] = (float)(block->y);
 	pos[2] = (float)(block->z);
-	for (int i = 0; i < NUM_BLOCK_FACES; i++) {
+	for (int i = 0; i < 6; i++) {
        	 	if (!(block->visible_faces & (1 << i))) {
          	   continue;
         	}
@@ -112,4 +99,9 @@ void block_draw(struct block *block, unsigned int shd)
 			SHADER_UNIFORM_TYPE_VEC3);
 		mesh_draw(block_mesh, 6, i * 6); // bad name for elem count arg. should be NUM_ELEM_PER_FACE etc.
 	}
+}
+
+void block_set_visible_face(struct block *block, int flag)
+{
+	block->visible_faces = flag;
 }
