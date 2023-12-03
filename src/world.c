@@ -5,12 +5,12 @@
 
 #include <math.h>
 
-#define CHUNK_WIDTH 8
+#define CHUNK_WIDTH 1
 #define CHUNK_HEIGHT 1
-#define CHUNK_DEPTH 8
-#define MAX_NUM_CHUNKS 512 // Temporary value for amount of chunks possible.
-#define DRAW_DISTANCE 4 // TODO: Make this customizable.
-#define INIT_DRAW_DISTANCE 8
+#define CHUNK_DEPTH 1
+#define MAX_NUM_CHUNKS 1024 // Temporary value for amount of chunks possible.
+#define DRAW_DISTANCE 1 // TODO: Make this customizable. Radius from center chunk in all directionds.
+#define INIT_DRAW_DISTANCE 1 // 1 Center row/col + X on each side (1 + X * 2)
 
 enum chunk_state {
 	CHUNK_STATE_UNDEFINED = 0,
@@ -26,6 +26,7 @@ struct chunk {
 };
 
 static struct chunk world[MAX_NUM_CHUNKS];
+static int count;
 
 static int calc_index(vec2 pos)
 {
@@ -86,6 +87,7 @@ static void chunk_generate(struct chunk *chunk, vec2 pos, enum block_type type)
 				int px, pz;
 				int dx, dy, dz;
 				struct block *block;
+				int faces;
 
 				px = (int)pos[0];
 				pz = (int)pos[1];
@@ -93,12 +95,30 @@ static void chunk_generate(struct chunk *chunk, vec2 pos, enum block_type type)
 				dy = y * BLOCK_SIZE;
 				dz = (z + pz) * BLOCK_SIZE;
 				block = &chunk[idx].blocks[x][y][z];
+				faces = BLOCK_FACE_TOP | BLOCK_FACE_BOTTOM;
+				// TODO: Check neighbour blocks for face culling.
+				// Now we only check for chunk edges as test.
+				// We should do this on second pass after init? After all chunks were generated.
+				// This will allow us to compare edge blocks to the neighbouring chunk aswell.
+				if ((z == CHUNK_DEPTH - 1)) {
+					faces = faces | BLOCK_FACE_FRONT;
+				}
+				if (z == 0) {
+					faces = faces | BLOCK_FACE_BACK;
+				}
+				if (x == 0) {
+					faces = faces | BLOCK_FACE_LEFT;
+				}
+				if (x == CHUNK_WIDTH - 1) {
+					faces = faces | BLOCK_FACE_RIGHT;
+				}
 				block_init(block, dx, dy, dz, type);
-
+				block_set_visible_face(block, faces);
 			}
 		}
 	}
 	chunk[idx].state = CHUNK_STATE_GENERATED;
+	count++;
 }
 
 static void chunk_draw(struct chunk *chunk, unsigned int shd)
@@ -118,11 +138,12 @@ void world_init(void)
 		FOR_RANGE(dz, INIT_DRAW_DISTANCE) {
 			vec2 pos;
 
-			pos[0] = (0.0f + (float)dx * CHUNK_WIDTH);
-			pos[1] = (0.0f + (float)dz * CHUNK_DEPTH);
+			pos[0] = (0.0f + (float)(dx) * CHUNK_WIDTH);
+			pos[1] = (0.0f + (float)(dz) * CHUNK_DEPTH);
 			chunk_generate(world, pos, 1);
 		}
 	}
+	LOG("%d", count);
 }
 
 void world_draw(vec2 origin, unsigned int shd)
