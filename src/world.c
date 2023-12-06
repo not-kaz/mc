@@ -26,20 +26,20 @@ struct chunk {
 };
 
 static struct chunk world[MAX_NUM_CHUNKS];
-static int count;
+static const float HALF_BLOCK = (BLOCK_SIZE / 2.0f);
 
-static int calc_index(vec2 pos)
+static int calc_index(ivec2 pos)
 {
 	int tmp;
 
 	// IMPROVE: Find a better hash, this one has has too many collisions.
-	tmp = ((int)(pos[1]) * 1 + (((int)(pos[0]) * 1 + 1) / 2 ));
+	tmp = (pos[1] * 1 + ((pos[0] * 1 + 1) / 2 ));
 	tmp = tmp * tmp;
-	tmp += ((int)(pos[0]) * 1);
+	tmp += (pos[0] * 1);
 	return (tmp % MAX_NUM_CHUNKS);
 }
 
-static struct chunk *chunk_get(vec2 pos)
+static struct chunk *find_chunk(ivec2 pos)
 {
 	struct chunk *chunk;
 	int idx;
@@ -47,8 +47,7 @@ static struct chunk *chunk_get(vec2 pos)
 	chunk = world;
 	idx = abs(calc_index(pos));
 	while (chunk[idx].state == CHUNK_STATE_GENERATED) {
-		if (chunk[idx].x == (int)(pos[0])
-				&& chunk[idx].z == (int)(pos[1])) {
+		if (chunk[idx].x == pos[0] && chunk[idx].z == pos[1]) {
 			break;
 		}
 		idx++;
@@ -59,17 +58,13 @@ static struct chunk *chunk_get(vec2 pos)
 	return &chunk[idx];
 }
 
-static void chunk_generate(struct chunk *chunk, vec2 pos, enum block_type type)
+static void generate_chunk(ivec2 pos, enum block_type type)
 {
 	int idx;
 
-	if (!chunk) {
-		return;
-	}
 	idx = abs(calc_index(pos));
-	while (chunk[idx].state == CHUNK_STATE_GENERATED) {
-		if (chunk[idx].x == (int)(pos[0])
-				&& chunk[idx].z == (int)(pos[1])) {
+	while (world[idx].state == CHUNK_STATE_GENERATED) {
+		if (world[idx].x == pos[0] && world[idx].z == pos[1]) {
 			return;
 		}
 		idx++;
@@ -79,22 +74,19 @@ static void chunk_generate(struct chunk *chunk, vec2 pos, enum block_type type)
 			idx = 0;
 		}
 	}
-	chunk[idx].x = (int)(pos[0]);
-	chunk[idx].z = (int)(pos[1]);
+	world[idx].x = pos[0];
+	world[idx].z = pos[1];
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
 		for (int y = 0; y < CHUNK_HEIGHT; y++) {
 			for (int z = 0; z < CHUNK_DEPTH; z++) {
-				int px, pz;
 				int dx, dy, dz;
 				struct block *block;
 				int faces;
 
-				px = (int)pos[0];
-				pz = (int)pos[1];
-				dx = (x + px) * BLOCK_SIZE;
+				dx = (x + pos[0]) * BLOCK_SIZE;
 				dy = y * BLOCK_SIZE;
-				dz = (z + pz) * BLOCK_SIZE;
-				block = &chunk[idx].blocks[x][y][z];
+				dz = (z + pos[1]) * BLOCK_SIZE;
+				block = &world[idx].blocks[x][y][z];
 				faces = BLOCK_FACE_TOP | BLOCK_FACE_BOTTOM;
 				// TODO: Check neighbour blocks for face culling.
 				// Now we only check for chunk edges as test.
@@ -117,11 +109,10 @@ static void chunk_generate(struct chunk *chunk, vec2 pos, enum block_type type)
 			}
 		}
 	}
-	chunk[idx].state = CHUNK_STATE_GENERATED;
-	count++;
+	world[idx].state = CHUNK_STATE_GENERATED;
 }
 
-static void chunk_draw(struct chunk *chunk, unsigned int shd)
+static void draw_chunk(struct chunk *chunk, unsigned int shd)
 {
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
 		for (int y = 0; y < CHUNK_HEIGHT; y++) {
@@ -134,37 +125,36 @@ static void chunk_draw(struct chunk *chunk, unsigned int shd)
 
 void world_init(void)
 {
-	FOR_RANGE(dx, INIT_DRAW_DISTANCE) {
-		FOR_RANGE(dz, INIT_DRAW_DISTANCE) {
-			vec2 pos;
+	for (int dx = -INIT_DRAW_DISTANCE; dx <= INIT_DRAW_DISTANCE; dx++) {
+		for (int dz = -INIT_DRAW_DISTANCE; dz <= INIT_DRAW_DISTANCE; dz++) {
+			ivec2 pos;
 
-			pos[0] = (0.0f + (float)(dx) * CHUNK_WIDTH);
-			pos[1] = (0.0f + (float)(dz) * CHUNK_DEPTH);
-			chunk_generate(world, pos, 1);
+			pos[0] = (dx * CHUNK_WIDTH);
+			pos[1] = (dz * CHUNK_DEPTH);
+			generate_chunk(pos, 1);
 		}
 	}
-	LOG("%d", count);
 }
 
 void world_draw(vec2 origin, unsigned int shd)
 {
-	struct chunk *chunk;
+	int x;
+	int y;
 
-	origin[0] = floorf((origin[0] + (float)(BLOCK_SIZE / 2)) / CHUNK_WIDTH)
-		* CHUNK_WIDTH;
-	origin[1] = floorf((origin[1] + (float)(BLOCK_SIZE / 2)) / CHUNK_DEPTH)
-		* CHUNK_DEPTH;
-	FOR_RANGE(dx, DRAW_DISTANCE) {
-		FOR_RANGE(dz, DRAW_DISTANCE) {
-			vec2 pos;
+	x = (int)(floorf((origin[0] + HALF_BLOCK) / CHUNK_WIDTH) * CHUNK_WIDTH);
+	y = (int)(floorf((origin[1] + HALF_BLOCK) / CHUNK_DEPTH) * CHUNK_DEPTH);
+	for (int dx = -DRAW_DISTANCE; dx <= DRAW_DISTANCE; dx++) {
+		for (int dz = -DRAW_DISTANCE; dz <= DRAW_DISTANCE; dz++) {
+			ivec2 pos;
+			struct chunk *chunk;
 
-			pos[0] = (origin[0] + (float)(dx) * CHUNK_WIDTH);
-			pos[1] = (origin[1] + (float)(dz) * CHUNK_DEPTH);
-			chunk = chunk_get(pos);
+			pos[0] = (x + dx * CHUNK_WIDTH);
+			pos[1] = (y + dz * CHUNK_DEPTH);
+			chunk = find_chunk(pos);
 			if (chunk->state != CHUNK_STATE_GENERATED) {
 				continue;
 			}
-			chunk_draw(chunk, shd);
+			draw_chunk(chunk, shd);
 		}
 	}
 }
