@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 	UNUSED(argv);
 	game_startup();
 	gfx_get_window_size(&ww, &wh);
-	shd = shader_build("shaders\\vert.glsl", "shaders\\frag.glsl");
+	shd = shader_build("shaders\\block_colored_vert.glsl", "shaders\\block_colored_frag.glsl");
 	shader_use(shd);
 	block_build_shared_mesh();
 	cam = camera_create();
