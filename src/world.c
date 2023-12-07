@@ -2,15 +2,16 @@
 #include "common.h"
 #include "world.h"
 #include "log.h"
+#include "shader.h"
 
 #include <math.h>
 
-#define CHUNK_WIDTH 1
-#define CHUNK_HEIGHT 1
-#define CHUNK_DEPTH 1
+#define CHUNK_WIDTH 8
+#define CHUNK_HEIGHT 8
+#define CHUNK_DEPTH 8
 #define MAX_NUM_CHUNKS 1024 // Temporary value for amount of chunks possible.
 #define DRAW_DISTANCE 1 // TODO: Make this customizable. Radius from center chunk in all directionds.
-#define INIT_DRAW_DISTANCE 1 // 1 Center row/col + X on each side (1 + X * 2)
+#define INIT_DRAW_DISTANCE 4 // 1 Center row/col + X on each side (1 + X * 2)
 
 enum chunk_state {
 	CHUNK_STATE_UNDEFINED = 0,
@@ -141,12 +142,14 @@ void world_draw(vec2 origin, unsigned int shd)
 	int x;
 	int y;
 
+
 	x = (int)(floorf((origin[0] + HALF_BLOCK) / CHUNK_WIDTH) * CHUNK_WIDTH);
 	y = (int)(floorf((origin[1] + HALF_BLOCK) / CHUNK_DEPTH) * CHUNK_DEPTH);
-	for (int dx = -DRAW_DISTANCE; dx <= DRAW_DISTANCE; dx++) {
-		for (int dz = -DRAW_DISTANCE; dz <= DRAW_DISTANCE; dz++) {
+	for (int dx = -INIT_DRAW_DISTANCE; dx <= INIT_DRAW_DISTANCE; dx++) {
+		for (int dz = -INIT_DRAW_DISTANCE; dz <= INIT_DRAW_DISTANCE; dz++) {
 			ivec2 pos;
 			struct chunk *chunk;
+			vec4 custom_color;
 
 			pos[0] = (x + dx * CHUNK_WIDTH);
 			pos[1] = (y + dz * CHUNK_DEPTH);
@@ -154,6 +157,19 @@ void world_draw(vec2 origin, unsigned int shd)
 			if (chunk->state != CHUNK_STATE_GENERATED) {
 				continue;
 			}
+			if ((dx >= -DRAW_DISTANCE && dx <= DRAW_DISTANCE)
+					&& (dz >= -DRAW_DISTANCE && dz <= DRAW_DISTANCE)) {
+				custom_color[0] = 0.0f;
+				custom_color[1] = 0.5f;
+				custom_color[2] = 0.0f;
+				custom_color[3] = 1.0f;
+			} else {
+				custom_color[0] = 0.5f;
+				custom_color[1] = 0.0f;
+				custom_color[2] = 0.0f;
+				custom_color[3] = 1.0f;
+			}
+			shader_set_uniform(shd, "custom_color", custom_color, SHADER_UNIFORM_TYPE_VEC4);
 			draw_chunk(chunk, shd);
 		}
 	}
