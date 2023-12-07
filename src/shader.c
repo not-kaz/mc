@@ -34,7 +34,7 @@ static unsigned int compile_shader(const char *fp, GLenum type)
 	glGetShaderiv(sh, GL_COMPILE_STATUS, &res);
 	if (!res) {
 		glGetShaderInfoLog(sh, MSG_MAX_LEN, NULL, msg);
-		DIE("Shader compliation failed: %s", msg);
+		DIE("Shader compliation failed (%s): %s", fp, msg);
 	}
 	return sh;
 }
