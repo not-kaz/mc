@@ -1,4 +1,4 @@
-#include "mesh.h"
+ #include "mesh.h"
 
 #include "common.h"
 #include "log.h"
@@ -8,6 +8,9 @@
 #include <glad/gl.h>
 
 #define MAX_NUM_BUFFER_ATTRIBUTES 32
+
+// TODO: Rewrite this whole thing. There are some uninitialized variables, etc.
+// Make it cleaner and clearer.
 
 struct vertex_attribute {
 	const char *name;
@@ -60,14 +63,15 @@ struct mesh *mesh_create(float *vertices, size_t vertices_size,
 	if (!vertices || !vertices_size || !indices || !indices_size) {
 		return NULL;
 	}
-	mesh = malloc(sizeof(struct mesh));
-	if (!mesh) {
+	mesh = malloc(sizeof(struct mesh))
+;	if (!mesh) {
 		return NULL;
 	}
 	mesh->vert_buf.data = vertices;
 	mesh->vert_buf.size = vertices_size;
 	mesh->vert_buf.vert_count = (int)((vertices_size / sizeof(float)));
 	mesh->vert_buf.stride = 0;
+	mesh->vert_buf.attr_idx = 0;
 	mesh->vert_buf.id = 0;
 	mesh->idx_buf.data = indices;
 	mesh->idx_buf.size = indices_size;
@@ -92,6 +96,7 @@ void mesh_assign_attr(struct mesh *mesh, const char *name, int num_comps)
 	if (!mesh || !name || !num_comps) {
 		return;
 	}
+	LOG("atr %u", mesh->vert_buf.attr_idx);
 	mesh->vert_buf.attrs[mesh->vert_buf.attr_idx].name = name;
 	mesh->vert_buf.attrs[mesh->vert_buf.attr_idx].num_comps = num_comps;
 	mesh->vert_buf.attr_idx++;
@@ -141,15 +146,5 @@ void mesh_draw(struct mesh *mesh, int elem_count, int idx_offset)
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // HACK: Is this necessary?
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // HACK: Is this necessary?
+	//LOG("MESH DRAW");
 }
-
-/*void mesh_draw(struct mesh *mesh)
-{
-	if (!mesh || !mesh->vert_buf.size || !mesh->vert_buf.stride) {
-		return;
-	}
-	glBindVertexArray(mesh->gl_id);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vert_buf.id);
-	glDrawArrays(GL_TRIANGLES, 0, 3); // this will only draw 3 vertices
-	LOG("%llu %llu", mesh->vert_buf.size, mesh->vert_buf.stride);
-}*/
