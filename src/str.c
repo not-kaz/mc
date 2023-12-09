@@ -19,7 +19,8 @@ char *str_duplicate(char *str)
 
 char *str_split(char **str_p, const char *delim)
 {
-	char *start, *end;
+	char *start;
+	char *end;
 
 	start = *str_p;
 	if (!start) {
@@ -38,7 +39,8 @@ char *str_split(char **str_p, const char *delim)
 char *str_read_file(const char *filename)
 {
 	FILE *fp;
-	char *src, buf;
+	char *src;
+	char buf;
 	size_t len;
 
 	fp = fopen(filename, "rb+");
