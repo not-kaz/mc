@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+// TODO: Some errors pop up when passing float values as format args.
+
 static struct tm *read_time(void)
 {
 	time_t t;

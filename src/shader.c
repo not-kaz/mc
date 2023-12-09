@@ -14,6 +14,9 @@
 
 /* TODO: Implement missing error handling in compile_shader(). */
 
+// TODO: This can be abstracted away from the main code somehow.
+// It's ugly to see the internals such as the unsigned int shader id.
+
 static unsigned int compile_shader(const char *fp, GLenum type)
 {
 	int res;

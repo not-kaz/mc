@@ -1,5 +1,6 @@
 #include "block.h"
 #include "camera.h"
+#include "chunk.h"
 #include "common.h"
 #include "gfx.h"
 #include "input.h"
@@ -8,7 +9,6 @@
 #include "shader.h"
 #include "texture.h"
 #include "types.h"
-#include "world.h"
 
 #include <cglm/cglm.h>
 #include <glad/gl.h>
@@ -18,7 +18,7 @@
 #define SDL_INIT_FLAG (SDL_INIT_VIDEO)
 #define IMG_INIT_FLAG (IMG_INIT_JPG | IMG_INIT_PNG)
 
-/* TODO: Replace CGLM with a light alternative or make a minimal math header. */
+// TODO: Replace CGLM with a lightweight alternative. It takes too long to comp.
 
 static void game_startup(void)
 {
@@ -46,8 +46,10 @@ static void game_shutdown(void)
 int main(int argc, char **argv)
 {
 	unsigned int shd;
-	int ww, wh;
+	int ww;
+	int wh;
 	struct camera *cam;
+	struct chunk chunk;
 	vec2 pp;
 
 	UNUSED(argc);
@@ -58,14 +60,17 @@ int main(int argc, char **argv)
 	shader_use(shd);
 	block_build_shared_mesh();
 	cam = camera_create();
-	world_init();
+	chunk_init(&chunk, 0, 0);
+	chunk_build_mesh(&chunk);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	while (1) {
-		mat4 model, view, projection;
+		mat4 model;
+		mat4 view;
+		mat4 projection;
 
 		glm_mat4_identity(model);
 		glm_mat4_identity(projection);
 		glm_mat4_identity(view);
-		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		glm_perspective(glm_rad(45.0f), (float)(ww) / (float)(wh), 0.1f,
 			100.0f, projection);
 		camera_calc_view_matrix(cam, view);
@@ -78,8 +83,8 @@ int main(int argc, char **argv)
 		input_poll_events();
 		camera_update(cam);
 		camera_get_position(cam, pp);
-		gfx_clear_framebuffer(0.2f, 0.5f, 0.5f, 1.0f);
-		world_draw(pp, shd);
+		gfx_clear_framebuffer(0.2f, 0.2f, 0.2f, 1.0f);
+		chunk_draw(&chunk);
 		gfx_present_framebuffer();
 	}
 	game_shutdown();

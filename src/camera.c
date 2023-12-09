@@ -34,6 +34,9 @@ struct camera {
 	float sens;
 };
 
+// TODO: Our camera behaves weirdly. There is a draw distance issue.
+// There is also a problem with perspective when looking up at a something tall.
+
 static void update_cam_vectors(struct camera *cam)
 {
 	cam->front[COORD_X] = cosf(glm_rad(cam->yaw))
@@ -48,7 +51,8 @@ static void update_cam_vectors(struct camera *cam)
 
 static void handle_rotation(struct camera *cam)
 {
-	int32_t mx, my;
+	int32_t mx;
+	int32_t my;
 
 	input_get_relative_mouse_position(&mx, &my);
 	cam->yaw = fmodf((cam->yaw + ((float)(mx) * DEFAULT_SENS)), 360.0f);
