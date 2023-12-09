@@ -6,7 +6,8 @@
 #define BLOCK_SIZE 1 // Size of a block in world unit terms.
 
 enum block_type {
-	BLOCK_TYPE_DIRT = 0,
+	BLOCK_TYPE_AIR = 0,
+	BLOCK_TYPE_DIRT,
 	BLOCK_TYPE_GRASS,
 	BLOCK_TYPE_COBBLE,
 	NUM_BLOCK_TYPES
