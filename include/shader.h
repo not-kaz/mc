@@ -16,4 +16,3 @@ void shader_set_uniform(unsigned int sh, const char *name, const void *val,
 		enum shader_uniform_type type);
 
 #endif
-
