@@ -1,6 +1,4 @@
 #include "block.h"
-
-#include "cube.h"
 #include "log.h"
 #include "mesh.h"
 #include "shader.h"
@@ -20,6 +18,9 @@ struct block_texture_data {
 	} face[6];
 };
 
+// TODO: All this needs to be heavily simplified.
+// Blocks should only contain bare minimum info / data.
+
 // TODO: Make this customizable, read these values from a json file.
 // Consider a function that returns these values for simplicity.
 struct block_texture_data texture_data[] = {
@@ -30,13 +31,13 @@ struct block_texture_data texture_data[] = {
 };
 
 static struct mesh *block_mesh;
-static unsigned int texture_atlas;
+
 
 // TODO: Change incorrect variable types. We use floats where they don't make sense.
 
 void block_build_shared_mesh(void)
 {
-	// HACK: Figure out a better way of handling this!
+/*	// HACK: Figure out a better way of handling this!
 	if (block_mesh) {
 		LOG("Shared block mesh already created. Creating again...");
 		free(block_mesh);
@@ -51,7 +52,7 @@ void block_build_shared_mesh(void)
 	mesh_assign_attr(block_mesh, "pos_attr", 3);
 	mesh_assign_attr(block_mesh, "tex_coord_attr", 2);
 	mesh_process_attr_layout(block_mesh);
-	texture_build(&texture_atlas, "assets\\sprites.jpg");
+	texture_build(&texture_atlas, "assets\\sprites.jpg");*/
   }
 
 void block_init(struct block *block, int x, int y, int z, enum block_type type)
@@ -76,7 +77,7 @@ void block_draw(struct block *block, unsigned int shd)
 	if (!block) {
 		return;
 	}
-	texture_bind(&texture_atlas);
+	//texture_bind(&texture_atlas);
 	// HACK: This is unreadable and hacky.
 	size[0] = DEFAULT_TEXTURE_SIZE_PX;
 	size[1] = DEFAULT_TEXTURE_SIZE_PX;

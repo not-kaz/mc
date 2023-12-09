@@ -7,8 +7,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define SAFE_MODE_WIN_WIDTH 1280
-#define SAFE_MODE_WIN_HEIGHT 800
+#define SAFE_MODE_WIN_WIDTH 1920
+#define SAFE_MODE_WIN_HEIGHT 1080
 
 /* TODO: Add a bit-wise flag that keeps track of graphics state. *
  *	 Fullscreen, safe mode etc...                            */
@@ -43,7 +43,8 @@ static void get_display_modes(void)
 
 void gfx_start(void)
 {
-	int ww, wh;
+	int ww;
+	int wh;
 	unsigned int wf;
 
 	if (gfx_ctx.window || gfx_ctx.gl_ctx) {
