@@ -8,6 +8,12 @@
 /* REVIEW: To keep it simple, we should use a single texture atlas.  *
  * Alternatively, we must keep track of every single texture object. */
 
+
+// TODO: The textures should be abstracted away and placed in a hash map.
+// They can be retrieved for use by a simple func call with their name.
+// We could also have each mesh have a pointer to a collection of textures.
+// Each mesh_draw call they bind those textures for u./se, retrieved from map.
+
 static void assign_gl_tex_params(unsigned int *id, SDL_Surface *data)
 {
 	glGenTextures(1, id);
