@@ -1,4 +1,3 @@
-#include "block.h"
 #include "camera.h"
 #include "chunk.h"
 #include "common.h"
@@ -14,6 +13,7 @@
 #include <glad/gl.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <time.h>
 
 #define SDL_INIT_FLAG (SDL_INIT_VIDEO)
 #define IMG_INIT_FLAG (IMG_INIT_JPG | IMG_INIT_PNG)
@@ -49,20 +49,23 @@ int main(int argc, char **argv)
 	int ww;
 	int wh;
 	struct camera *cam;
-	struct chunk chunk;
+	struct chunk *chunk;
 	vec2 pp;
+	unsigned int texture_atlas;
 
+	srand(time(NULL));
 	UNUSED(argc);
 	UNUSED(argv);
 	game_startup();
 	gfx_get_window_size(&ww, &wh);
-	shd = shader_build("shaders\\block_colored_vert.glsl", "shaders\\block_colored_frag.glsl");
+	shd = shader_build("shaders\\block_textured_vert.glsl", "shaders\\block_textured_frag.glsl");
 	shader_use(shd);
-	block_build_shared_mesh();
+	//block_build_shared_mesh();
 	cam = camera_create();
-	chunk_init(&chunk, 0, 0);
-	chunk_build_mesh(&chunk);
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	chunk = chunk_create(0, 0);
+	texture_build(&texture_atlas, "assets\\sprites.jpg");
+	texture_bind(&texture_atlas);
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	while (1) {
 		mat4 model;
 		mat4 view;
@@ -72,7 +75,7 @@ int main(int argc, char **argv)
 		glm_mat4_identity(projection);
 		glm_mat4_identity(view);
 		glm_perspective(glm_rad(45.0f), (float)(ww) / (float)(wh), 0.1f,
-			100.0f, projection);
+			1000.0f, projection);
 		camera_calc_view_matrix(cam, view);
 		shader_set_uniform(shd, "model", model[0],
 			SHADER_UNIFORM_TYPE_MAT4);
@@ -84,7 +87,9 @@ int main(int argc, char **argv)
 		camera_update(cam);
 		camera_get_position(cam, pp);
 		gfx_clear_framebuffer(0.2f, 0.2f, 0.2f, 1.0f);
-		chunk_draw(&chunk);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		chunk_draw(chunk);
 		gfx_present_framebuffer();
 	}
 	game_shutdown();
