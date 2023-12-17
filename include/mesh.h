@@ -10,6 +10,6 @@ void mesh_assign_attr(struct mesh *mesh, const char *name, int num_components);
 void mesh_process_attr_layout(struct mesh *mesh);
 void mesh_bind(struct mesh *mesh);
 void mesh_unbind(void);
-void mesh_draw(struct mesh *mesh, int elem_count, int idx_offset, int cull);
+void mesh_draw(struct mesh *mesh, bool cull);
 
 #endif
