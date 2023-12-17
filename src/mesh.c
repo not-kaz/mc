@@ -96,7 +96,6 @@ void mesh_assign_attr(struct mesh *mesh, const char *name, int num_comps)
 	if (!mesh || !name || !num_comps) {
 		return;
 	}
-	LOG("atr %u", mesh->vert_buf.attr_idx);
 	mesh->vert_buf.attrs[mesh->vert_buf.attr_idx].name = name;
 	mesh->vert_buf.attrs[mesh->vert_buf.attr_idx].num_comps = num_comps;
 	mesh->vert_buf.attr_idx++;
@@ -120,7 +119,7 @@ void mesh_process_attr_layout(struct mesh *mesh)
 	}
 	glBindVertexArray(mesh->gl_id);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vert_buf.id);
-	for (unsigned int i = 0; i < mesh->vert_buf.attr_idx && mesh; i++) {
+	for (unsigned int i = 0; i < mesh->vert_buf.attr_idx; i++) {
 		attr = &mesh->vert_buf.attrs[i];
 		glEnableVertexAttribArray(i);
 		glVertexAttribPointer(i, attr->num_comps, GL_FLOAT,
@@ -132,19 +131,20 @@ void mesh_process_attr_layout(struct mesh *mesh)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void mesh_draw(struct mesh *mesh, int elem_count, int idx_offset)
+void mesh_draw(struct mesh *mesh, bool cull)
 {
 	if (!mesh) {
 		return;
 	}
-	elem_count = (elem_count ? elem_count : mesh->idx_buf.elem_count);
+	if (cull) {
+		glEnable(GL_CULL_FACE);
+	}
 	glBindVertexArray(mesh->gl_id);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vert_buf.id);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->idx_buf.id);
-	glDrawElements(GL_TRIANGLES, elem_count, GL_UNSIGNED_INT,
-		(void *)(sizeof(GLuint) * (GLuint)(idx_offset)));
+	glDrawElements(GL_TRIANGLES, mesh->idx_buf.elem_count, GL_UNSIGNED_INT,
+		(void *)(sizeof(GLuint) * (GLuint)(0))); // Probably only 0 just fine..
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // HACK: Is this necessary?
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // HACK: Is this necessary?
-	//LOG("MESH DRAW");
 }
