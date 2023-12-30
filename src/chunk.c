@@ -6,13 +6,14 @@
 #include "shader.h"
 
 #include <glad/gl.h>
+#include <math.h>
 #include <stdlib.h>
 #include <cglm/types.h>
 
-#define CHUNK_WIDTH 8
-#define CHUNK_HEIGHT 8
-#define CHUNK_DEPTH 8
-#define CHUNK_GEOM_MEM_SIZE 1048576 // One MB worth of vertices?
+#define CHUNK_WIDTH 128
+#define CHUNK_HEIGHT 128
+#define CHUNK_DEPTH 128
+#define CHUNK_GEOM_MEM_SIZE 104857600 // One MB worth of vertices?
 
 struct chunk {
 	int x;
@@ -75,73 +76,35 @@ add_block_face_to_geometry(struct chunk *chunk, int x, int y, int z, int face)
 static void
 construct_block_geometry(struct chunk *chunk, int x, int y, int z)
 {
-	 /// TERRIBLE CODE BUT THIS IS JUST PLACEHOLDER TO SEE IF IT WORKS.
-	// TODO: This code is a hack, rewrite it!
-	int left = 0;
-	int right = 0;
-
-	if (chunk->blocks[x][y][z].type == BLOCK_TYPE_AIR) {
-		return;
-	}
 	if (x == 0) {
 		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_LEFT);
-		left = 1;
+	} else if (chunk->blocks[x - 1][y][z].type == BLOCK_TYPE_AIR) {
+		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_LEFT);
 	}
 	if (x == CHUNK_WIDTH - 1) {
 		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_RIGHT);
-		right = 1;
+	} else if (chunk->blocks[x + 1][y][z].type == BLOCK_TYPE_AIR) {
+		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_RIGHT);
 	}
-	if (!left) {
-		if (chunk->blocks[x - 1][y][z].type == BLOCK_TYPE_AIR) {
-			add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_LEFT);
-		}
-	}
-	if (!right) {
-		if (chunk->blocks[x + 1][y][z].type == BLOCK_TYPE_AIR) {
-			add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_RIGHT);
-		}
-	}
-	left = 0;
-	right = 0;
 	if (y == 0) {
 		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_BOTTOM);
-		left = 1;
+	} else if (chunk->blocks[x][y - 1][z].type == BLOCK_TYPE_AIR) {
+		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_BOTTOM);
 	}
 	if (y == CHUNK_HEIGHT - 1) {
 		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_TOP);
-		right = 1;
+	} else if (chunk->blocks[x][y + 1][z].type == BLOCK_TYPE_AIR) {
+		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_TOP);
 	}
-	if (!left) {
-		if (chunk->blocks[x][y - 1][z].type == BLOCK_TYPE_AIR) {
-			add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_BOTTOM);
-		}
-	}
-	if (!right) {
-		if (chunk->blocks[x][y + 1][z].type == BLOCK_TYPE_AIR) {
-			add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_TOP);
-		}
-	}
-	left = 0;
-	right = 0;
 	if (z == 0) {
 		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_BACK);
-		left = 1;
-
+	} else 	if (chunk->blocks[x][y][z - 1].type == BLOCK_TYPE_AIR) {
+		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_BACK);
 	}
 	if (z == CHUNK_DEPTH - 1) {
 		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_FRONT);
-		right = 1;
-
-	}
-	if (!left) {
-		if (chunk->blocks[x][y][z - 1].type == BLOCK_TYPE_AIR) {
-			add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_BACK);
-		}
-	}
-	if (!right) {
-		if (chunk->blocks[x][y][z + 1].type == BLOCK_TYPE_AIR) {
-			add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_FRONT);
-		}
+	} else if (chunk->blocks[x][y][z + 1].type == BLOCK_TYPE_AIR) {
+		add_block_face_to_geometry(chunk, x, y, z, BLOCK_SIDE_FRONT);
 	}
 }
 
@@ -161,12 +124,24 @@ chunk_create(int pos_x, int pos_z)
 		for (int y = 0; y < CHUNK_HEIGHT; y++) {
 			for (int z = 0; z < CHUNK_DEPTH; z++) {
 				struct block *block;
-				int dx, dz;
+				int dx, dy, dz;
+				int ofx, ofz;
+				enum block_type type;
+				float freq = 0.2;
+				float amp = 10;
 
 				block = &chunk->blocks[x][y][z];
 				dx = (x + chunk->x);
+				ofx = sin(x * freq) * amp;
+				ofz = sin(z * freq) * amp;
+				dy = 100 + ofx + ofz;
 				dz = (z + chunk->z);
-				block_init(block, dx, y, dz, rand() % 4);
+				if (y < dy) {
+					type = BLOCK_TYPE_GRASS;
+				} else {
+					type = BLOCK_TYPE_AIR;
+				}
+				block_init(block, dx, y, dz, type);
 			}
 		}
 	}
@@ -189,8 +164,10 @@ chunk_create(int pos_x, int pos_z)
 				struct block *block;
 
 				block = &chunk->blocks[x][y][z];
-				construct_block_geometry(chunk, block->x,
-					block->y, block->z);
+				if (block->type != BLOCK_TYPE_AIR) {
+					construct_block_geometry(chunk,
+						block->x, block->y, block->z);
+				}
 			}
 		}
 	}
@@ -200,8 +177,8 @@ chunk_create(int pos_x, int pos_z)
 	mesh_assign_attr(chunk->mesh, "pos_attr", 3);
 	mesh_assign_attr(chunk->mesh, "tex_coord_attr", 2);
 	mesh_process_attr_layout(chunk->mesh);
-	LOG("%u", chunk->geometry.vertices_size);
 	return chunk;
+	// TODO: We need to fix mem leak here if any of these allocs fail.
 }
 
 void
